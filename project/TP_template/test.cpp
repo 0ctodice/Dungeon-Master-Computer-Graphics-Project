@@ -2,25 +2,32 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <cstddef>
+#include <glimac/common.hpp>
 #include <glimac/Program.hpp>
 #include <glimac/FilePath.hpp>
 #include <glimac/Image.hpp>
+#include <glimac/Texture.hpp>
 
 using namespace glimac;
 
-struct Vertex2DColor
+struct Vertex3DText
 {
-    glm::vec2 position;
+    glm::vec3 position;
+    glm::vec3 normal;
     glm::vec2 textureCoord;
 
-    Vertex2DColor() {}
-    Vertex2DColor(glm::vec2 pos, glm::vec2 tex) : position{pos}, textureCoord{tex} {}
+    Vertex3DText() {}
+    Vertex3DText(glm::vec3 pos, glm::vec3 nor, glm::vec2 tex) : position{pos}, normal{nor}, textureCoord{tex} {}
 };
 
 int main(int argc, char **argv)
 {
+
+    const int WINDOW_WIDTH = 1920;
+    const int WINDOW_HEIGHT = 1080;
+
     // Initialize SDL and open a window
-    SDLWindowManager windowManager(800, 600, "GLImac");
+    SDLWindowManager windowManager(WINDOW_WIDTH, WINDOW_HEIGHT, "GLImac");
 
     // Initialize glew for OpenGL3+ support
     GLenum glewInitError = glewInit();
@@ -36,53 +43,55 @@ int main(int argc, char **argv)
     /*********************************
      * HERE SHOULD COME THE INITIALIZATION CODE
      *********************************/
+    // CREATION DES TEXTURES
 
-    std::unique_ptr<Image> texturePtr;
+    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/project/assets/textures/slime.png");
 
-    if ((texturePtr = loadImage(FilePath("/home/thomas2dumont/Computer_Graphics/GLImac-Template/assets/textures/triforce.png"))) == NULL)
-    {
-        std::cerr << "TEXTURE NOT LOADED" << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    GLuint texture;
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texturePtr->getWidth(), texturePtr->getHeight(), 0, GL_RGBA, GL_FLOAT, texturePtr->getPixels());
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // GESTION DES SHADERS
 
     FilePath applicationPath(argv[0]);
     Program program = loadProgram(
-        applicationPath.dirPath() + "shaders/text2D.vs.glsl",
-        applicationPath.dirPath() + "shaders/text2D.fs.glsl");
+        applicationPath.dirPath() + "shaders/3D.vs.glsl",
+        applicationPath.dirPath() + "shaders/text3D.fs.glsl");
 
     program.use();
 
+    // RECUPERATION DES LOCATION DES VARIABLES UNIFORMES
+
+    GLint uMVPMatrixLocation = glGetUniformLocation(program.getGLId(), "uMVPMatrix");
+    GLint uMVMatrixLocation = glGetUniformLocation(program.getGLId(), "uMVMatrix");
+    GLint uNormalMatrixLocation = glGetUniformLocation(program.getGLId(), "uNormalMatrix");
     GLint uTextureLocation = glGetUniformLocation(program.getGLId(), "uTexture");
 
-    const GLuint VERTEX_ATTR_POSITION = 3;
-    const GLuint VERTEX_ATTR_TEXTURE_COORDINATE = 8;
+    glEnable(GL_DEPTH_TEST);
+
+    // CREATION DES MATRIX
+
+    glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
+    glm::mat4 globalMVMatrix = glm::mat4(glm::vec4(1.f, 0.f, 0.f, 0.f), glm::vec4(0.f, 1.f, 0.f, 0.f), glm::vec4(0.f, 0.f, 1.f, 0.f), glm::vec4(0.f, 0.f, 0.f, 1.f));
+
+    // CREATION DES BUFFERS
+
+    const GLuint VERTEX_ATTR_POSITION = 0;
+    const GLuint VERTEX_ATTR_NORMAL = 1;
+    const GLuint VERTEX_ATTR_TEXTURE_COORDINATE = 2;
 
     GLuint vbo;
     GLuint vao;
-    Vertex2DColor vertices[] = {
-        Vertex2DColor(glm::vec2(-.5f, -.5f), glm::vec2(0.f, 1.f)),
-        Vertex2DColor(glm::vec2(.5f, -.5f), glm::vec2(1.f, 1.f)),
-        Vertex2DColor(glm::vec2(.5f, .5f), glm::vec2(1.f, 0.f)),
-        Vertex2DColor(glm::vec2(-.5f, -.5f), glm::vec2(0.f, 1.f)),
-        Vertex2DColor(glm::vec2(.5f, .5f), glm::vec2(1.f, 0.f)),
-        Vertex2DColor(glm::vec2(-.5f, .5f), glm::vec2(0.f, 0.f)),
+    auto quadNormal = glm::cross(glm::vec3(-.5f, -.5f, 0.f), glm::vec3(.5f, .5f, 0.f));
+    Vertex3DText vertices[] = {
+        Vertex3DText(glm::vec3(-.5f, -.5f, 0.f), quadNormal, glm::vec2(0.f, 1.f)),
+        Vertex3DText(glm::vec3(.5f, -.5f, 0.f), quadNormal, glm::vec2(1.f, 1.f)),
+        Vertex3DText(glm::vec3(.5f, .5f, 0.f), quadNormal, glm::vec2(1.f, 0.f)),
+        Vertex3DText(glm::vec3(-.5f, -.5f, 0.f), quadNormal, glm::vec2(0.f, 1.f)),
+        Vertex3DText(glm::vec3(.5f, .5f, 0.f), quadNormal, glm::vec2(1.f, 0.f)),
+        Vertex3DText(glm::vec3(-.5f, .5f, 0.f), quadNormal, glm::vec2(0.f, 0.f)),
     };
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(Vertex2DColor), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(Vertex3DText), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -92,16 +101,20 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
-    glVertexAttribPointer(VERTEX_ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2DColor), offsetof(Vertex2DColor, position));
+    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3DText), offsetof(Vertex3DText, position));
+
+    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
+    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3DText), (const GLvoid *)offsetof(Vertex3DText, normal));
 
     glEnableVertexAttribArray(VERTEX_ATTR_TEXTURE_COORDINATE);
-    glVertexAttribPointer(VERTEX_ATTR_TEXTURE_COORDINATE, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2DColor), (const GLvoid *)offsetof(Vertex2DColor, textureCoord));
+    glVertexAttribPointer(VERTEX_ATTR_TEXTURE_COORDINATE, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3DText), (const GLvoid *)offsetof(Vertex3DText, textureCoord));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
 
-    // Application loop:
+    // BOUCLE D'APPLICATION
+
     bool done = false;
     while (!done)
     {
@@ -119,19 +132,28 @@ int main(int argc, char **argv)
          * HERE SHOULD COME THE RENDERING CODE
          *********************************/
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        slimeTexture.bind();
         glUniform1i(uTextureLocation, 0);
+        auto slimeMVMatrix = glm::translate(globalMVMatrix, glm::vec3(0.f, 0.f, -5.f));
+        slimeMVMatrix = glm::scale(slimeMVMatrix, glm::vec3(2.f, 2.f, 2.f));
+        auto slimeNormalMatrix = glm::transpose(glm::inverse(slimeMVMatrix));
+        glUniformMatrix4fv(uMVMatrixLocation, 1, GL_FALSE, glm::value_ptr(slimeMVMatrix));
+        glUniformMatrix4fv(uMVPMatrixLocation, 1, GL_FALSE, glm::value_ptr(globalProjectionMatrix * slimeMVMatrix));
+        glUniformMatrix4fv(uNormalMatrixLocation, 1, GL_FALSE, glm::value_ptr(slimeNormalMatrix));
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
+        slimeTexture.unbind();
         // Update the display
         windowManager.swapBuffers();
     }
 
+    // NETTOYAGE
+
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
-    glDeleteTextures(1, &texture);
+    slimeTexture.deleteTexture();
 
     return EXIT_SUCCESS;
 }
