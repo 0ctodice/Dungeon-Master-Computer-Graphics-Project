@@ -7,6 +7,7 @@
 #include <glimac/FilePath.hpp>
 #include <glimac/Image.hpp>
 #include <glimac/Texture.hpp>
+#include <glimac/MatrixManager.hpp>
 
 using namespace glimac;
 
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
      *********************************/
     // CREATION DES TEXTURES
 
-    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/project/assets/textures/slime.png");
+    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/project/assets/textures/slime.png", false);
 
     // GESTION DES SHADERS
 
@@ -68,7 +69,8 @@ int main(int argc, char **argv)
     // CREATION DES MATRIX
 
     glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
-    glm::mat4 globalMVMatrix = glm::mat4(glm::vec4(1.f, 0.f, 0.f, 0.f), glm::vec4(0.f, 1.f, 0.f, 0.f), glm::vec4(0.f, 0.f, 1.f, 0.f), glm::vec4(0.f, 0.f, 0.f, 1.f));
+
+    MatrixManager slimeMatrix{&globalProjectionMatrix};
 
     // CREATION DES BUFFERS
 
@@ -78,7 +80,9 @@ int main(int argc, char **argv)
 
     GLuint vbo;
     GLuint vao;
+
     auto quadNormal = glm::cross(glm::vec3(-.5f, -.5f, 0.f), glm::vec3(.5f, .5f, 0.f));
+
     Vertex3DText vertices[] = {
         Vertex3DText(glm::vec3(-.5f, -.5f, 0.f), quadNormal, glm::vec2(0.f, 1.f)),
         Vertex3DText(glm::vec3(.5f, -.5f, 0.f), quadNormal, glm::vec2(1.f, 1.f)),
@@ -88,16 +92,17 @@ int main(int argc, char **argv)
         Vertex3DText(glm::vec3(-.5f, .5f, 0.f), quadNormal, glm::vec2(0.f, 0.f)),
     };
 
+    // BIND DU VBO
+
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(Vertex3DText), vertices, GL_STATIC_DRAW);
-
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // BIND DU VAO
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
@@ -110,7 +115,6 @@ int main(int argc, char **argv)
     glVertexAttribPointer(VERTEX_ATTR_TEXTURE_COORDINATE, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex3DText), (const GLvoid *)offsetof(Vertex3DText, textureCoord));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     glBindVertexArray(0);
 
     // BOUCLE D'APPLICATION
@@ -135,14 +139,10 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
         slimeTexture.bind();
-        glUniform1i(uTextureLocation, 0);
-        auto slimeMVMatrix = glm::translate(globalMVMatrix, glm::vec3(0.f, 0.f, -5.f));
-        slimeMVMatrix = glm::scale(slimeMVMatrix, glm::vec3(2.f, 2.f, 2.f));
-        auto slimeNormalMatrix = glm::transpose(glm::inverse(slimeMVMatrix));
-        glUniformMatrix4fv(uMVMatrixLocation, 1, GL_FALSE, glm::value_ptr(slimeMVMatrix));
-        glUniformMatrix4fv(uMVPMatrixLocation, 1, GL_FALSE, glm::value_ptr(globalProjectionMatrix * slimeMVMatrix));
-        glUniformMatrix4fv(uNormalMatrixLocation, 1, GL_FALSE, glm::value_ptr(slimeNormalMatrix));
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        slimeMatrix.setMVMatrix(glm::mat4(1.f));
+        slimeMatrix.translate(glm::vec3(0.f, 0.f, -5.f));
+        slimeMatrix.scale(glm::vec3(2.f, 2.f, 2.f));
+        slimeMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
         glBindVertexArray(0);
         slimeTexture.unbind();
         // Update the display
