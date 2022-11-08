@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
     // CREATION DES TEXTURES
 
-    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/project/assets/textures/slime.png", false);
+    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/test.png", false);
 
     // GESTION DES SHADERS
 
