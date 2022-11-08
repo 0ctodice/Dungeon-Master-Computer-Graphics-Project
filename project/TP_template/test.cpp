@@ -15,10 +15,10 @@ struct Vertex3DText
 {
     glm::vec3 position;
     glm::vec3 normal;
-    glm::vec2 textureCoord;
+    glm::vec3 textureCoord;
 
     Vertex3DText() {}
-    Vertex3DText(glm::vec3 pos, glm::vec3 nor, glm::vec2 tex) : position{pos}, normal{nor}, textureCoord{tex} {}
+    Vertex3DText(glm::vec3 pos, glm::vec3 nor, glm::vec3 tex) : position{pos}, normal{nor}, textureCoord{tex} {}
 };
 
 int main(int argc, char **argv)
@@ -44,6 +44,11 @@ int main(int argc, char **argv)
     /*********************************
      * HERE SHOULD COME THE INITIALIZATION CODE
      *********************************/
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // CREATION DES TEXTURES
 
     Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/project/assets/textures/slime.png", false);
@@ -52,8 +57,8 @@ int main(int argc, char **argv)
 
     FilePath applicationPath(argv[0]);
     Program program = loadProgram(
-        applicationPath.dirPath() + "shaders/3D.vs.glsl",
-        applicationPath.dirPath() + "shaders/text3D.fs.glsl");
+        applicationPath.dirPath() + "shaders/3DAlpha.vs.glsl",
+        applicationPath.dirPath() + "shaders/text3DAlpha.fs.glsl");
 
     program.use();
 
@@ -63,8 +68,6 @@ int main(int argc, char **argv)
     GLint uMVMatrixLocation = glGetUniformLocation(program.getGLId(), "uMVMatrix");
     GLint uNormalMatrixLocation = glGetUniformLocation(program.getGLId(), "uNormalMatrix");
     GLint uTextureLocation = glGetUniformLocation(program.getGLId(), "uTexture");
-
-    glEnable(GL_DEPTH_TEST);
 
     // CREATION DES MATRIX
 
@@ -84,12 +87,12 @@ int main(int argc, char **argv)
     auto quadNormal = glm::cross(glm::vec3(-.5f, -.5f, 0.f), glm::vec3(.5f, .5f, 0.f));
 
     Vertex3DText vertices[] = {
-        Vertex3DText(glm::vec3(-.5f, -.5f, 0.f), quadNormal, glm::vec2(0.f, 1.f)),
-        Vertex3DText(glm::vec3(.5f, -.5f, 0.f), quadNormal, glm::vec2(1.f, 1.f)),
-        Vertex3DText(glm::vec3(.5f, .5f, 0.f), quadNormal, glm::vec2(1.f, 0.f)),
-        Vertex3DText(glm::vec3(-.5f, -.5f, 0.f), quadNormal, glm::vec2(0.f, 1.f)),
-        Vertex3DText(glm::vec3(.5f, .5f, 0.f), quadNormal, glm::vec2(1.f, 0.f)),
-        Vertex3DText(glm::vec3(-.5f, .5f, 0.f), quadNormal, glm::vec2(0.f, 0.f)),
+        Vertex3DText(glm::vec3(-.5f, -.5f, 0.f), quadNormal, glm::vec3(0.f, 1.f, 0.f)),
+        Vertex3DText(glm::vec3(.5f, -.5f, 0.f), quadNormal, glm::vec3(1.f, 1.f, 0.f)),
+        Vertex3DText(glm::vec3(.5f, .5f, 0.f), quadNormal, glm::vec3(1.f, 0.f, 0.f)),
+        Vertex3DText(glm::vec3(-.5f, -.5f, 0.f), quadNormal, glm::vec3(0.f, 1.f, 0.f)),
+        Vertex3DText(glm::vec3(.5f, .5f, 0.f), quadNormal, glm::vec3(1.f, 0.f, 0.f)),
+        Vertex3DText(glm::vec3(-.5f, .5f, 0.f), quadNormal, glm::vec3(0.f, 0.f, 0.f)),
     };
 
     // BIND DU VBO
@@ -137,6 +140,7 @@ int main(int argc, char **argv)
          *********************************/
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(1.f, 0.f, 0.f, 1.f);
         glBindVertexArray(vao);
         slimeTexture.bind();
         slimeMatrix.setMVMatrix(glm::mat4(1.f));

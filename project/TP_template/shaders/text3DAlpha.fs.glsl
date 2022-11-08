@@ -7,8 +7,8 @@ in vec3 vTexCoords;
 
 uniform sampler2D uTexture;
 
-out vec3 fFragColor;
+out vec4 fFragColor;
 
 void main(){
-    fFragColor = (texture(uTexture, vTexCoords.xy)).xyz;
+    fFragColor = texture(uTexture, vTexCoords.xy);
 }
