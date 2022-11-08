@@ -8,6 +8,7 @@
 #include <glimac/Image.hpp>
 #include <glimac/Texture.hpp>
 #include <glimac/MatrixManager.hpp>
+#include <glimac/PPMParser.hpp>
 
 using namespace glimac;
 
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // CREATION DES TEXTURES
-
+    PPMParser map("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/map.ppm");
     Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/test.png", false);
 
     // GESTION DES SHADERS
