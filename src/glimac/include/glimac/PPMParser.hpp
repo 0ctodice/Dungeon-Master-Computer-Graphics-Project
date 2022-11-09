@@ -15,6 +15,10 @@ namespace glimac
         int r, g, b;
         RGB(){};
         RGB(int red, int green, int blue) : r{red}, g{green}, b{blue} {}
+        bool operator==(const RGB &other)
+        {
+            return r == other.r && g == other.g && b == other.b;
+        }
     };
 
     class PPMParser
