@@ -27,7 +27,7 @@ namespace glimac
 
         void rotate(float value, glm::vec3 rot)
         {
-            MVMatrix = glm::rotate(MVMatrix, value, rot);
+            MVMatrix = glm::rotate(MVMatrix, glm::radians(value), rot);
         }
 
         void scale(glm::vec3 sca)

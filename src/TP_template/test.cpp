@@ -51,9 +51,14 @@ int main(int argc, char **argv)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // CREATION DES TEXTURES
+    // GENERATION DE LA MAP
+
     PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/map.ppm");
-    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/slime.png", false);
+    MapGenerator map(mapParsed);
+
+    // CREATION DES TEXTURES
+
+    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/test.png", false);
 
     // GESTION DES SHADERS
 
@@ -76,8 +81,6 @@ int main(int argc, char **argv)
     glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
 
     MatrixManager slimeMatrix{&globalProjectionMatrix};
-
-    MapGenerator map(mapParsed, &globalProjectionMatrix);
 
     // CREATION DES BUFFERS
 
@@ -144,15 +147,9 @@ int main(int argc, char **argv)
          *********************************/
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(1.f, 0.f, 0.f, 1.f);
         glBindVertexArray(vao);
-        slimeTexture.bind();
-        slimeMatrix.setMVMatrix(glm::mat4(1.f));
-        slimeMatrix.translate(glm::vec3(0.f, 0.f, -5.f));
-        slimeMatrix.scale(glm::vec3(2.f, 2.f, 2.f));
-        slimeMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+        map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, &globalProjectionMatrix);
         glBindVertexArray(0);
-        slimeTexture.unbind();
         // Update the display
         windowManager.swapBuffers();
     }
@@ -161,6 +158,7 @@ int main(int argc, char **argv)
 
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
+    map.deleteMap();
     slimeTexture.deleteTexture();
 
     return EXIT_SUCCESS;
