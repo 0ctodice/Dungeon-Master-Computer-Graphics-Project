@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
     // GENERATION DE LA MAP
 
-    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/map2.ppm");
+    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/map.ppm");
     MapGenerator map(mapParsed);
 
     // GESTION DES SHADERS
@@ -129,6 +129,8 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    SDL_EnableKeyRepeat(0, 0);
+
     // BOUCLE D'APPLICATION
 
     bool done = false;
@@ -142,6 +144,30 @@ int main(int argc, char **argv)
             {
                 done = true; // Leave the loop after this iteration
             }
+            if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_z:
+                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 1.f)) * globalMVMatrix;
+                    break;
+                case SDLK_s:
+                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -1.f)) * globalMVMatrix;
+                    break;
+                case SDLK_q:
+                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(1.f, 0.f, 0.f)) * globalMVMatrix;
+                    break;
+                case SDLK_d:
+                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(-1.f, 0.f, 0.f)) * globalMVMatrix;
+                    break;
+                case SDLK_a:
+                    globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(-90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
+                    break;
+                case SDLK_e:
+                    globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
+                    break;
+                }
+            }
         }
 
         /*********************************
@@ -150,6 +176,7 @@ int main(int argc, char **argv)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
+
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, &globalProjectionMatrix, globalMVMatrix);
         glBindVertexArray(0);
         // Update the display
