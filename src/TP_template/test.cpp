@@ -53,12 +53,8 @@ int main(int argc, char **argv)
 
     // GENERATION DE LA MAP
 
-    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/map.ppm");
+    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/map2.ppm");
     MapGenerator map(mapParsed);
-
-    // CREATION DES TEXTURES
-
-    Texture slimeTexture("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/test.png", false);
 
     // GESTION DES SHADERS
 
@@ -79,9 +75,15 @@ int main(int argc, char **argv)
     // CREATION DES MATRIX
 
     glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
+    glm::mat4 globalMVMatrix = glm::mat4(1.f);
+    globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(180.f), glm::vec3(0.f, 0.f, 1.f));
+    auto dir = map.getFirstDirection();
 
-    MatrixManager slimeMatrix{&globalProjectionMatrix};
+    auto angle = dir.x == -1.f ? -90.f : dir.x == 1.f ? 90.f
+                                     : dir.y == 1.f   ? 180.f
+                                                      : 0.f;
 
+    globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(angle), glm::vec3(0.f, 1.f, 0.f));
     // CREATION DES BUFFERS
 
     const GLuint VERTEX_ATTR_POSITION = 0;
@@ -148,7 +150,7 @@ int main(int argc, char **argv)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
-        map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, &globalProjectionMatrix);
+        map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, &globalProjectionMatrix, globalMVMatrix);
         glBindVertexArray(0);
         // Update the display
         windowManager.swapBuffers();
@@ -159,7 +161,6 @@ int main(int argc, char **argv)
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
     map.deleteMap();
-    slimeTexture.deleteTexture();
 
     return EXIT_SUCCESS;
 }
