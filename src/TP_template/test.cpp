@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
     // GENERATION DE LA MAP
 
-    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/map.ppm");
+    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/room.ppm");
     MapGenerator map(mapParsed);
 
     // GESTION DES SHADERS
@@ -76,14 +76,15 @@ int main(int argc, char **argv)
 
     glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
     glm::mat4 globalMVMatrix = glm::mat4(1.f);
-    globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(180.f), glm::vec3(0.f, 0.f, 1.f));
-    auto dir = map.getFirstDirection();
+    auto playerDirection = map.getFirstDirection();
+    auto playerPosition = glm::vec2(0);
 
-    auto angle = dir.x == -1.f ? -90.f : dir.x == 1.f ? 90.f
-                                     : dir.y == 1.f   ? 180.f
-                                                      : 0.f;
+    auto angle = playerDirection.x == -1.f ? -90.f : playerDirection.x == 1.f ? 90.f
+                                                 : playerDirection.y == 1.f   ? 0.f
+                                                                              : 180.f;
 
     globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(angle), glm::vec3(0.f, 1.f, 0.f));
+
     // CREATION DES BUFFERS
 
     const GLuint VERTEX_ATTR_POSITION = 0;
@@ -129,8 +130,6 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    SDL_EnableKeyRepeat(0, 0);
-
     // BOUCLE D'APPLICATION
 
     bool done = false;
@@ -140,30 +139,59 @@ int main(int argc, char **argv)
         SDL_Event e;
         while (windowManager.pollEvent(e))
         {
-            if (e.type == SDL_QUIT)
+            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
             {
                 done = true; // Leave the loop after this iteration
             }
             if (e.type == SDL_KEYDOWN)
             {
+                glm::vec2 nextPosition;
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_z:
-                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 1.f)) * globalMVMatrix;
+                    nextPosition = playerPosition + glm::vec2(-1.f, 0.f);
+                    std::cout << nextPosition << std::endl;
+                    if (!map.thereIsAWall(nextPosition))
+                    {
+                        playerPosition = nextPosition;
+                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 1.f)) * globalMVMatrix;
+                    }
                     break;
                 case SDLK_s:
-                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -1.f)) * globalMVMatrix;
+                    nextPosition = playerPosition + glm::vec2(1.f, 0.f);
+                    std::cout << nextPosition << std::endl;
+                    if (!map.thereIsAWall(nextPosition))
+                    {
+                        playerPosition = nextPosition;
+                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -1.f)) * globalMVMatrix;
+                    }
                     break;
                 case SDLK_q:
-                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(1.f, 0.f, 0.f)) * globalMVMatrix;
+                    nextPosition = playerPosition + glm::vec2(0.f, -1.f);
+                    std::cout << nextPosition << std::endl;
+                    if (!map.thereIsAWall(nextPosition))
+                    {
+                        playerPosition = nextPosition;
+                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(1.f, 0.f, 0.f)) * globalMVMatrix;
+                    }
                     break;
                 case SDLK_d:
-                    globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(-1.f, 0.f, 0.f)) * globalMVMatrix;
+                    nextPosition = playerPosition + glm::vec2(0.f, 1.f);
+                    std::cout << nextPosition << std::endl;
+                    if (!map.thereIsAWall(nextPosition))
+                    {
+                        playerPosition = nextPosition;
+                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(-1.f, 0.f, 0.f)) * globalMVMatrix;
+                    }
                     break;
                 case SDLK_a:
+                    // playerPosition = glm::vec2(playerPosition.y, playerPosition.x);
+                    // std::cout << playerPosition << std::endl;
                     globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(-90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
                     break;
                 case SDLK_e:
+                    // playerPosition = glm::vec2(playerPosition.y, playerPosition.x);
+                    // std::cout << playerPosition << std::endl;
                     globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
                     break;
                 }
@@ -176,7 +204,6 @@ int main(int argc, char **argv)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
-
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, &globalProjectionMatrix, globalMVMatrix);
         glBindVertexArray(0);
         // Update the display
