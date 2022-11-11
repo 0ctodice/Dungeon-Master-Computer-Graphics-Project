@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <cstddef>
+#include <string>
 #include <glimac/common.hpp>
 #include <glimac/Program.hpp>
 #include <glimac/FilePath.hpp>
@@ -52,8 +53,8 @@ int main(int argc, char **argv)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // GENERATION DE LA MAP
-
-    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/room.ppm");
+    std::string mapFile{argv[1]};
+    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + mapFile);
     MapGenerator map(mapParsed);
 
     // GESTION DES SHADERS
@@ -76,12 +77,14 @@ int main(int argc, char **argv)
 
     glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
     glm::mat4 globalMVMatrix = glm::mat4(1.f);
+
     auto playerDirection = map.getFirstDirection();
     auto playerPosition = glm::vec2(0);
 
-    auto angle = playerDirection.x == -1.f ? -90.f : playerDirection.x == 1.f ? 90.f
-                                                 : playerDirection.y == 1.f   ? 0.f
-                                                                              : 180.f;
+    int inverseCoords = playerDirection.y == 1.f ? 0 : playerDirection.y == -1.f ? 2
+                                                   : playerDirection.x == 1.f    ? 3
+                                                                                 : 1;
+    auto angle = 90.f * playerDirection.x + 180.f * (playerDirection.y > 0);
 
     globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(angle), glm::vec3(0.f, 1.f, 0.f));
 
@@ -145,53 +148,78 @@ int main(int argc, char **argv)
             }
             if (e.type == SDL_KEYDOWN)
             {
-                glm::vec2 nextPosition;
+                glm::vec2 target;
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_z:
-                    nextPosition = playerPosition + glm::vec2(-1.f, 0.f);
-                    std::cout << nextPosition << std::endl;
-                    if (!map.thereIsAWall(nextPosition))
+                    if (inverseCoords > 0)
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, 1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(-1, 0)
+                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(0, -1)
+                                                                                                             : glm::vec2(1, 0);
+                    else
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, 1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(1, 0)
+                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(0, -1)
+                                                                                                             : glm::vec2(-1, 0);
+                    if (!map.thereIsAWall(playerPosition + target))
                     {
-                        playerPosition = nextPosition;
+                        playerPosition += target;
+
                         globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 1.f)) * globalMVMatrix;
                     }
                     break;
                 case SDLK_s:
-                    nextPosition = playerPosition + glm::vec2(1.f, 0.f);
-                    std::cout << nextPosition << std::endl;
-                    if (!map.thereIsAWall(nextPosition))
+                    if (inverseCoords > 0)
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, -1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(1, 0)
+                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(0, 1)
+                                                                                                              : glm::vec2(-1, 0);
+                    else
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, -1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(-1, 0)
+                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(1, 0)
+                                                                                                              : glm::vec2(1, 0);
+                    if (!map.thereIsAWall(playerPosition + target))
                     {
-                        playerPosition = nextPosition;
+                        playerPosition += target;
                         globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -1.f)) * globalMVMatrix;
                     }
                     break;
                 case SDLK_q:
-                    nextPosition = playerPosition + glm::vec2(0.f, -1.f);
-                    std::cout << nextPosition << std::endl;
-                    if (!map.thereIsAWall(nextPosition))
+                    if (inverseCoords > 0)
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, 1)
+                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(-1, 0)
+                                                                                                             : glm::vec2(0, -1);
+                    else
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, -1)
+                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(-1, 0)
+                                                                                                             : glm::vec2(0, 1);
+
+                    if (!map.thereIsAWall(playerPosition + target))
                     {
-                        playerPosition = nextPosition;
+                        playerPosition += target;
                         globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(1.f, 0.f, 0.f)) * globalMVMatrix;
                     }
                     break;
                 case SDLK_d:
-                    nextPosition = playerPosition + glm::vec2(0.f, 1.f);
-                    std::cout << nextPosition << std::endl;
-                    if (!map.thereIsAWall(nextPosition))
+                    if (inverseCoords > 0)
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(-1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, -1)
+                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(1, 0)
+                                                                                                              : glm::vec2(0, 1);
+                    else
+                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(-1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, 1)
+                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(1, 0)
+                                                                                                              : glm::vec2(0, -1);
+
+                    if (!map.thereIsAWall(playerPosition + target))
                     {
-                        playerPosition = nextPosition;
+                        playerPosition += target;
                         globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(-1.f, 0.f, 0.f)) * globalMVMatrix;
                     }
                     break;
                 case SDLK_a:
-                    // playerPosition = glm::vec2(playerPosition.y, playerPosition.x);
-                    // std::cout << playerPosition << std::endl;
+                    inverseCoords--;
                     globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(-90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
                     break;
                 case SDLK_e:
-                    // playerPosition = glm::vec2(playerPosition.y, playerPosition.x);
-                    // std::cout << playerPosition << std::endl;
+                    inverseCoords++;
                     globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
                     break;
                 }

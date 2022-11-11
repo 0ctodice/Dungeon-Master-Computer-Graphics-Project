@@ -19,7 +19,7 @@ namespace glimac
     private:
         std::vector<glm::vec2> walls;
         std::vector<glm::vec2> corridors;
-        glm::vec2 start{0};
+        glm::vec2 start;
         glm::vec2 end;
         PPMParser map;
         Texture wallTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/wall.png", false};
@@ -35,7 +35,6 @@ namespace glimac
             {
                 for (int j = 0; j < map.getWidth(); j++)
                 {
-
                     auto pixel = pixels[i * map.getWidth() + j];
 
                     if (pixel == RGB(0, 0, 0))
@@ -63,16 +62,15 @@ namespace glimac
             auto origin = start;
 
             std::transform(walls.begin(), walls.end(), walls.begin(), [origin](glm::vec2 wall)
-                           { auto pos = wall - origin; 
-                           std::cout << pos << std::endl;
-                           return glm::vec2(pos.x, pos.y*-1); });
+                           { auto pos = wall - origin;
+                           return glm::vec2(pos.x*-1, pos.y); });
 
             std::transform(corridors.begin(), corridors.end(), corridors.begin(), [origin](glm::vec2 corridor)
                            { auto pos = corridor - origin; 
-                           return glm::vec2(pos.x, pos.y*-1); });
+                           return glm::vec2(pos.x*-1, pos.y); });
 
             end -= start;
-            end = glm::vec2(end.x, end.y * -1);
+            end = glm::vec2(end.x * -1, end.y);
         }
 
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f))
@@ -162,19 +160,15 @@ namespace glimac
             groundTexture.deleteTexture();
         }
 
-        bool thereIsAWall(glm::vec2 pos) const
-        {
-            std::cout << (std::find(walls.begin(), walls.end(), pos) != walls.end()) << std::endl;
-            return std::find(walls.begin(), walls.end(), pos) != walls.end();
-        }
+        bool thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end(); }
 
         glm::vec2 getFirstDirection() const
         {
             auto i = start.x;
             auto j = start.y;
-            return i == 0                     ? glm::vec2(1.f, 0.f)
+            return i == 0                     ? glm::vec2(-1.f, 0.f)
                    : j == 0                   ? glm::vec2(0.f, 1.f)
-                   : i == map.getHeight() - 1 ? glm::vec2(-1.f, 0.f)
+                   : i == map.getHeight() - 1 ? glm::vec2(1.f, 0.f)
                    : j == map.getWidth() - 1  ? glm::vec2(0.f, -1.f)
                                               : glm::vec2(0.f);
         }
