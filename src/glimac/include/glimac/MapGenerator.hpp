@@ -21,21 +21,21 @@ namespace glimac
         std::vector<glm::vec2> corridors;
         glm::vec2 start;
         glm::vec2 end;
-        PPMParser map;
+        PPMParser *map;
         Texture wallTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/wall.png", false};
         Texture groundTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/ground.png", false};
         Texture ceilingTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/ceiling.png", false};
 
     public:
-        MapGenerator(PPMParser mapParsed) : map{mapParsed}
+        MapGenerator(PPMParser *mapParsed) : map{mapParsed}
         {
-            auto pixels = map.getPixels();
+            auto pixels = map->getPixels();
 
-            for (int i = 0; i < map.getHeight(); i++)
+            for (int i = 0; i < map->getHeight(); i++)
             {
-                for (int j = 0; j < map.getWidth(); j++)
+                for (int j = 0; j < map->getWidth(); j++)
                 {
-                    auto pixel = pixels[i * map.getWidth() + j];
+                    auto pixel = pixels[i * map->getWidth() + j];
 
                     if (pixel == RGB(0, 0, 0))
                     {
@@ -71,6 +71,12 @@ namespace glimac
 
             end -= start;
             end = glm::vec2(end.x * -1, end.y);
+        }
+
+        ~MapGenerator()
+        {
+            map = nullptr;
+            delete (map);
         }
 
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f))
@@ -166,11 +172,11 @@ namespace glimac
         {
             auto i = start.x;
             auto j = start.y;
-            return i == 0                     ? glm::vec2(-1.f, 0.f)
-                   : j == 0                   ? glm::vec2(0.f, 1.f)
-                   : i == map.getHeight() - 1 ? glm::vec2(1.f, 0.f)
-                   : j == map.getWidth() - 1  ? glm::vec2(0.f, -1.f)
-                                              : glm::vec2(0.f);
+            return i == 0                      ? glm::vec2(-1.f, 0.f)
+                   : j == 0                    ? glm::vec2(0.f, 1.f)
+                   : i == map->getHeight() - 1 ? glm::vec2(1.f, 0.f)
+                   : j == map->getWidth() - 1  ? glm::vec2(0.f, -1.f)
+                                               : glm::vec2(0.f);
         }
     };
 }

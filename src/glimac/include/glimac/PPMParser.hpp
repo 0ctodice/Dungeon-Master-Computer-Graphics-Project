@@ -3,7 +3,6 @@
 #include "glm.hpp"
 #include <GL/glew.h>
 #include <iostream>
-#include <glimac/FilePath.hpp>
 #include <stdio.h>
 #include <fstream>
 #include <vector>

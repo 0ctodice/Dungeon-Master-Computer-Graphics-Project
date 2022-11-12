@@ -22,6 +22,8 @@ namespace glimac
 
         ~SixAdjacencyCamera()
         {
+            globalMVMatrix = nullptr;
+            map = nullptr;
             delete (globalMVMatrix);
             delete (map);
         }

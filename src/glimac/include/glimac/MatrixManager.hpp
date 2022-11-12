@@ -22,6 +22,7 @@ namespace glimac
 
         ~MatrixManager()
         {
+            globalProjectionMatrix = nullptr;
             delete (globalProjectionMatrix);
         }
 

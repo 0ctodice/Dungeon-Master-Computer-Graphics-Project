@@ -11,6 +11,7 @@
 #include <glimac/MatrixManager.hpp>
 #include <glimac/MapGenerator.hpp>
 #include <glimac/PPMParser.hpp>
+#include <glimac/DataParser.hpp>
 #include <glimac/SixAdjacencyCamera.hpp>
 
 using namespace glimac;
@@ -54,9 +55,10 @@ int main(int argc, char **argv)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // GENERATION DE LA MAP
-    std::string mapFile{argv[1]};
-    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + mapFile);
-    MapGenerator map(mapParsed);
+    std::string dataFile = argv[1];
+    DataParser data{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
+    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/room.ppm");
+    MapGenerator map(&mapParsed);
 
     // GESTION DES SHADERS
 
