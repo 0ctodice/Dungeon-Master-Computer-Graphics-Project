@@ -20,6 +20,11 @@ namespace glimac
             MVMatrix = globalMVMatrix;
         }
 
+        ~MatrixManager()
+        {
+            delete (globalProjectionMatrix);
+        }
+
         void translate(glm::vec3 trans)
         {
             MVMatrix = glm::translate(MVMatrix, trans);

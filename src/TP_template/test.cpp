@@ -11,6 +11,7 @@
 #include <glimac/MatrixManager.hpp>
 #include <glimac/MapGenerator.hpp>
 #include <glimac/PPMParser.hpp>
+#include <glimac/SixAdjacencyCamera.hpp>
 
 using namespace glimac;
 
@@ -79,14 +80,13 @@ int main(int argc, char **argv)
     glm::mat4 globalMVMatrix = glm::mat4(1.f);
 
     auto playerDirection = map.getFirstDirection();
-    auto playerPosition = glm::vec2(0);
-
-    int inverseCoords = playerDirection.y == 1.f ? 0 : playerDirection.y == -1.f ? 2
-                                                   : playerDirection.x == 1.f    ? 3
-                                                                                 : 1;
     auto angle = 90.f * playerDirection.x + 180.f * (playerDirection.y > 0);
 
     globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(angle), glm::vec3(0.f, 1.f, 0.f));
+
+    // CREATION DE LA CAMERA
+
+    SixAdjacencyCamera camera{playerDirection, &globalMVMatrix, &map};
 
     // CREATION DES BUFFERS
 
@@ -152,75 +152,22 @@ int main(int argc, char **argv)
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_z:
-                    if (inverseCoords > 0)
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, 1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(-1, 0)
-                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(0, -1)
-                                                                                                             : glm::vec2(1, 0);
-                    else
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, 1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(1, 0)
-                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(0, -1)
-                                                                                                             : glm::vec2(-1, 0);
-                    if (!map.thereIsAWall(playerPosition + target))
-                    {
-                        playerPosition += target;
-
-                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 1.f)) * globalMVMatrix;
-                    }
+                    camera.moveFront();
                     break;
                 case SDLK_s:
-                    if (inverseCoords > 0)
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, -1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(1, 0)
-                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(0, 1)
-                                                                                                              : glm::vec2(-1, 0);
-                    else
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(0, -1) : abs(inverseCoords) % 4 == 1 ? glm::vec2(-1, 0)
-                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(1, 0)
-                                                                                                              : glm::vec2(1, 0);
-                    if (!map.thereIsAWall(playerPosition + target))
-                    {
-                        playerPosition += target;
-                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -1.f)) * globalMVMatrix;
-                    }
+                    camera.moveBack();
                     break;
                 case SDLK_q:
-                    if (inverseCoords > 0)
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, 1)
-                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(-1, 0)
-                                                                                                             : glm::vec2(0, -1);
-                    else
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, -1)
-                                                                             : abs(inverseCoords) % 4 == 2   ? glm::vec2(-1, 0)
-                                                                                                             : glm::vec2(0, 1);
-
-                    if (!map.thereIsAWall(playerPosition + target))
-                    {
-                        playerPosition += target;
-                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(1.f, 0.f, 0.f)) * globalMVMatrix;
-                    }
+                    camera.moveLeft();
                     break;
                 case SDLK_d:
-                    if (inverseCoords > 0)
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(-1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, -1)
-                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(1, 0)
-                                                                                                              : glm::vec2(0, 1);
-                    else
-                        target = abs(inverseCoords) % 4 == 0 ? glm::vec2(-1, 0) : abs(inverseCoords) % 4 == 1 ? glm::vec2(0, 1)
-                                                                              : abs(inverseCoords) % 4 == 2   ? glm::vec2(1, 0)
-                                                                                                              : glm::vec2(0, -1);
-
-                    if (!map.thereIsAWall(playerPosition + target))
-                    {
-                        playerPosition += target;
-                        globalMVMatrix = glm::translate(glm::mat4(1.f), glm::vec3(-1.f, 0.f, 0.f)) * globalMVMatrix;
-                    }
+                    camera.moveRight();
                     break;
                 case SDLK_a:
-                    inverseCoords--;
-                    globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(-90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
+                    camera.rotateLeft();
                     break;
                 case SDLK_e:
-                    inverseCoords++;
-                    globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f)) * globalMVMatrix;
+                    camera.rotateRight();
                     break;
                 }
             }
