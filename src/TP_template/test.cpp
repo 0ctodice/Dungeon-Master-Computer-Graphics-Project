@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     // GENERATION DE LA MAP
     std::string dataFile = argv[1];
     DataParser data{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
-    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/room.ppm");
+    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile());
     MapGenerator map(&mapParsed);
 
     // GESTION DES SHADERS
@@ -182,6 +182,10 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, &globalProjectionMatrix, globalMVMatrix);
+        for (auto treasure : data.getTreasures())
+        {
+            treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
+        }
         glBindVertexArray(0);
         // Update the display
         windowManager.swapBuffers();
@@ -191,6 +195,10 @@ int main(int argc, char **argv)
 
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
+    for (auto treasure : data.getTreasures())
+    {
+        treasure.Entity::deleteTexture();
+    }
     map.deleteMap();
 
     return EXIT_SUCCESS;

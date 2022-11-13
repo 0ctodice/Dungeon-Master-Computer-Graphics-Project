@@ -79,7 +79,7 @@ namespace glimac
             delete (map);
         }
 
-        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f))
+        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
         {
             wallTexture.bind();
             for (auto wall : walls)
@@ -165,6 +165,8 @@ namespace glimac
             ceilingTexture.deleteTexture();
             groundTexture.deleteTexture();
         }
+
+        glm::vec2 getStartPosition() const { return start; }
 
         bool thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end(); }
 

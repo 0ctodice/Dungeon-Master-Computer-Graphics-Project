@@ -6,40 +6,11 @@
 #include <stdio.h>
 #include <fstream>
 #include <iostream>
+#include <glimac/Treasure.hpp>
+#include <glimac/Monster.hpp>
 
 namespace glimac
 {
-    enum TreasureType
-    {
-        MONEY = 1,
-        HEALTH,
-        MAX_HEALTH,
-        CAC_WEAPON,
-        DST_WEAPON,
-        CA
-    };
-
-    struct Treasure
-    {
-        int id;
-        glm::vec2 position;
-        std::string name;
-        TreasureType type;
-        int value;
-        std::string texture;
-    };
-
-    struct Monster
-    {
-        int id;
-        glm::vec2 position;
-        std::string name;
-        int atk;
-        int ca;
-        int pv;
-        std::string texture;
-    };
-
     class DataParser
     {
     private:
@@ -99,7 +70,7 @@ namespace glimac
                 std::cout << "name " << name << std::endl;
 
                 std::getline(file, parser, ':');
-                TreasureType type = static_cast<TreasureType>(std::stoi(parser));
+                int type = std::stoi(parser);
                 parser = "";
 
                 std::cout << "type " << type << std::endl;
