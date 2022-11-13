@@ -13,6 +13,8 @@
 #include <glimac/PPMParser.hpp>
 #include <glimac/DataParser.hpp>
 #include <glimac/SixAdjacencyCamera.hpp>
+#include <glimac/Player.hpp>
+#include <memory>
 
 using namespace glimac;
 
@@ -135,7 +137,7 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    int playerTune = 0;
+    Player player;
 
     // BOUCLE D'APPLICATION
 
@@ -174,7 +176,7 @@ int main(int argc, char **argv)
                     camera.rotateRight();
                     break;
                 case SDLK_i:
-                    std::cout << "ACTUAL TUNE : " << playerTune << std::endl;
+                    player.displayInfos();
                     break;
                 }
             }
@@ -184,7 +186,24 @@ int main(int argc, char **argv)
                 // DO SHIT WITH TREASURE
                 if (treasurePtr != nullptr)
                 {
-                    playerTune += treasurePtr->getValue();
+                    switch (treasurePtr->getType())
+                    {
+                    case 1:
+                        player.setMoney(treasurePtr->getValue());
+                        break;
+                    case 2:
+                        player.setPV(treasurePtr->getValue());
+                        break;
+                    case 3:
+                        player.setPVMax(treasurePtr->getValue());
+                        break;
+                    case 4:
+                        player.setAtk(treasurePtr->getValue());
+                        break;
+                    case 5:
+                        player.setCa(treasurePtr->getValue());
+                        break;
+                    }
                     delete (treasurePtr);
                 }
             }

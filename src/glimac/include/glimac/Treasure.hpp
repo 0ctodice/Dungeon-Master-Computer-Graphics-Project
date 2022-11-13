@@ -11,7 +11,6 @@ namespace glimac
         HEALTH,
         MAX_HEALTH,
         CAC_WEAPON,
-        DST_WEAPON,
         CA
     };
 

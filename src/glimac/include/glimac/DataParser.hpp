@@ -144,7 +144,7 @@ namespace glimac
                                          { return (t.Entity::getPosition().x - origin.x) * -1 == position.x && t.Entity::getPosition().y - origin.y == position.y; });
             if (it == treasures.end())
                 return nullptr;
-            Treasure *treasurePtr = &(*it);
+            Treasure *treasurePtr = new Treasure(*it);
             std::cout << "PICKED " << treasurePtr->Entity::getName() << std::endl;
             treasures.erase(std::remove_if(treasures.begin(), treasures.end(), [position, origin](const Treasure &t)
                                            { return (t.Entity::getPosition().x - origin.x) * -1 == position.x && t.Entity::getPosition().y - origin.y == position.y; }),
