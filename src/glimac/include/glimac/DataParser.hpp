@@ -3,6 +3,7 @@
 #include "glm.hpp"
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <stdio.h>
 #include <fstream>
 #include <iostream>
@@ -137,6 +138,19 @@ namespace glimac
         std::string getMapFile() const { return mapFile; }
         std::vector<Treasure> getTreasures() const { return treasures; }
         std::vector<Monster> getMonsters() const { return monsters; }
-    };
+        Treasure *findTreasure(glm::vec2 position, glm::vec2 origin)
+        {
+            const auto it = std::find_if(treasures.begin(), treasures.end(), [position, origin](const Treasure &t)
+                                         { return (t.Entity::getPosition().x - origin.x) * -1 == position.x && t.Entity::getPosition().y - origin.y == position.y; });
+            if (it == treasures.end())
+                return nullptr;
+            Treasure *treasurePtr = &(*it);
+            std::cout << "PICKED " << treasurePtr->Entity::getName() << std::endl;
+            treasures.erase(std::remove_if(treasures.begin(), treasures.end(), [position, origin](const Treasure &t)
+                                           { return (t.Entity::getPosition().x - origin.x) * -1 == position.x && t.Entity::getPosition().y - origin.y == position.y; }),
+                            treasures.end());
 
+            return treasurePtr;
+        }
+    };
 }

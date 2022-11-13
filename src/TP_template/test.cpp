@@ -135,6 +135,8 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    int playerTune = 0;
+
     // BOUCLE D'APPLICATION
 
     bool done = false;
@@ -171,6 +173,19 @@ int main(int argc, char **argv)
                 case SDLK_e:
                     camera.rotateRight();
                     break;
+                case SDLK_i:
+                    std::cout << "ACTUAL TUNE : " << playerTune << std::endl;
+                    break;
+                }
+            }
+            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
+            {
+                Treasure *treasurePtr = data.findTreasure(camera.getFrontTile(), map.getStartPosition());
+                // DO SHIT WITH TREASURE
+                if (treasurePtr != nullptr)
+                {
+                    playerTune += treasurePtr->getValue();
+                    delete (treasurePtr);
                 }
             }
         }

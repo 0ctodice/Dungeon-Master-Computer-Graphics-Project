@@ -113,6 +113,21 @@ namespace glimac
             orientation++;
             *globalMVMatrix = glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f)) * *globalMVMatrix;
         }
+
+        glm::vec2 getFrontTile() const
+        {
+            glm::vec2 target;
+            if (orientation > 0)
+                target = abs(orientation) % 4 == 0 ? glm::vec2(0, 1) : abs(orientation) % 4 == 1 ? glm::vec2(-1, 0)
+                                                                   : abs(orientation) % 4 == 2   ? glm::vec2(0, -1)
+                                                                                                 : glm::vec2(1, 0);
+            else
+                target = abs(orientation) % 4 == 0 ? glm::vec2(0, 1) : abs(orientation) % 4 == 1 ? glm::vec2(1, 0)
+                                                                   : abs(orientation) % 4 == 2   ? glm::vec2(0, -1)
+                                                                                                 : glm::vec2(-1, 0);
+
+            return playerPosition + target;
+        }
     };
 
 }

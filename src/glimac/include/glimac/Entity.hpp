@@ -20,5 +20,8 @@ namespace glimac
         {
             texture.deleteTexture();
         }
+        glm::vec2 getPosition() const { return position; }
+        std::string getName() const { return name; }
+        Texture gettexture() const { return texture; }
     };
 }

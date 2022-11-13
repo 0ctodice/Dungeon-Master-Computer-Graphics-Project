@@ -34,6 +34,8 @@ namespace glimac
             matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
             texture.unbind();
         }
+        TreasureType getType() const { return type; }
+        int getValue() const { return value; }
     };
 
 }
