@@ -41,12 +41,14 @@ namespace glimac
             MVMatrix = glm::scale(MVMatrix, sca);
         }
 
-        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation) const
+        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation) const
         {
             glUniform1i(uTextureLocation, 0);
             glUniformMatrix4fv(uMVMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVMatrix));
             glUniformMatrix4fv(uMVPMatrixLocation, 1, GL_FALSE, glm::value_ptr(*globalProjectionMatrix * MVMatrix));
             glUniformMatrix4fv(uNormalMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(MVMatrix))));
+            auto l = MVMatrix * glm::vec4(0.f);
+            glUniform3f(uLightPosLocation, l.x, l.y, l.z);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 

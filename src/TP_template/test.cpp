@@ -77,6 +77,7 @@ int main(int argc, char **argv)
     GLint uMVMatrixLocation = glGetUniformLocation(program.getGLId(), "uMVMatrix");
     GLint uNormalMatrixLocation = glGetUniformLocation(program.getGLId(), "uNormalMatrix");
     GLint uTextureLocation = glGetUniformLocation(program.getGLId(), "uTexture");
+    GLint uLightPosLocation = glGetUniformLocation(program.getGLId(), "uLightPos");
 
     // CREATION DES MATRIX
 
@@ -215,10 +216,10 @@ int main(int argc, char **argv)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
-        map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, &globalProjectionMatrix, globalMVMatrix);
+        map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
         for (auto treasure : data.getTreasures())
         {
-            treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
+            treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
         }
         glBindVertexArray(0);
         // Update the display

@@ -79,7 +79,7 @@ namespace glimac
             delete (map);
         }
 
-        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
         {
             wallTexture.bind();
             for (auto wall : walls)
@@ -96,10 +96,10 @@ namespace glimac
                 wall2Matrix.translate(glm::vec3(0.f, 0.f, 0.5f));
                 wall3Matrix.translate(glm::vec3(0.f, 0.f, 0.5f));
                 wall4Matrix.translate(glm::vec3(0.f, 0.f, 0.5f));
-                wall1Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
-                wall2Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
-                wall3Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
-                wall4Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+                wall1Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+                wall2Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+                wall3Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+                wall4Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             }
             wallTexture.unbind();
 
@@ -111,14 +111,14 @@ namespace glimac
                 MatrixManager ceilingMatrix{globalPMatrix, ceilingMVMatrix};
                 ceilingMatrix.rotate(-90.f, glm::vec3(1.f, 0.f, 0.f));
                 ceilingMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
-                ceilingMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+                ceilingMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             }
             // TEXUTRE FOR START
 
             MatrixManager startCeilingMatrix{globalPMatrix, globalMVMatrix};
             startCeilingMatrix.rotate(-90.f, glm::vec3(1.f, 0.f, 0.f));
             startCeilingMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
-            startCeilingMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+            startCeilingMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
 
             // TEXTURE FOR END
 
@@ -126,7 +126,7 @@ namespace glimac
             MatrixManager endCeilingMatrix{globalPMatrix, ceilingMVMatrix};
             endCeilingMatrix.rotate(-90.f, glm::vec3(1.f, 0.f, 0.f));
             endCeilingMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
-            endCeilingMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+            endCeilingMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
 
             ceilingTexture.unbind();
 
@@ -138,7 +138,7 @@ namespace glimac
                 MatrixManager groundMatrix{globalPMatrix, groundMVMatrix};
                 groundMatrix.rotate(90.f, glm::vec3(1.f, 0.f, 0.f));
                 groundMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
-                groundMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+                groundMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             }
 
             // TEXUTRE FOR START
@@ -146,7 +146,7 @@ namespace glimac
             MatrixManager startGroundMatrix{globalPMatrix, globalMVMatrix};
             startGroundMatrix.rotate(90.f, glm::vec3(1.f, 0.f, 0.f));
             startGroundMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
-            startGroundMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+            startGroundMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
 
             // TEXTURE FOR END
 
@@ -154,7 +154,7 @@ namespace glimac
             MatrixManager endGroundMatrix{globalPMatrix, groundMVMatrix};
             endGroundMatrix.rotate(90.f, glm::vec3(1.f, 0.f, 0.f));
             endGroundMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
-            endGroundMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation);
+            endGroundMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
 
             groundTexture.unbind();
         }
