@@ -21,7 +21,8 @@ namespace glimac
         int value;
 
     public:
-        Treasure(int id, glm::vec2 pos, std::string name, int type, int value, std::string texture) : Entity{id, pos, name, texture}, type{static_cast<TreasureType>(type)}, value{value} {}
+        Treasure() = delete;
+        Treasure(int id, glm::vec2 pos, std::string name, int type, int value, std::string texture);
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::vec2 origin, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const override
         {
             texture.bind();
@@ -33,8 +34,8 @@ namespace glimac
             matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             texture.unbind();
         }
-        TreasureType getType() const { return type; }
-        int getValue() const { return value; }
+        TreasureType getType() const;
+        int getValue() const;
     };
 
 }
