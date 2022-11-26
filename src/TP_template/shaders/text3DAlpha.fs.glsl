@@ -12,7 +12,7 @@ uniform vec3 uLightPos;
 out vec4 fFragColor;
 
 void main(){
-    float light = 1.f / distance(uLightPos,vPosition_vs);
+    float light = min(1.f / pow(distance(uLightPos,vPosition_vs),2.f), 1.f);
     vec4 textColor = texture(uTexture, vTexCoords.xy);
     fFragColor = vec4(light*textColor.xyz, textColor.w);
 }
