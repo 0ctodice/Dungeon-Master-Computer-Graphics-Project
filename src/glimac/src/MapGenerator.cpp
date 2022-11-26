@@ -18,6 +18,11 @@ namespace glimac
                     walls.push_back(glm::vec2(i, j));
                     continue;
                 }
+                if (pixel == RGB(0, 0, 255))
+                {
+                    waters.push_back(glm::vec2(i, j));
+                    continue;
+                }
                 if (pixel == RGB(255, 255, 255))
                 {
                     corridors.push_back(glm::vec2(i, j));
@@ -41,6 +46,10 @@ namespace glimac
                        { auto pos = wall - origin;
                            return glm::vec2(pos.x*-1, pos.y); });
 
+        std::transform(waters.begin(), waters.end(), waters.begin(), [origin](glm::vec2 water)
+                       { auto pos = water - origin;
+                           return glm::vec2(pos.x*-1, pos.y); });
+
         std::transform(corridors.begin(), corridors.end(), corridors.begin(), [origin](glm::vec2 corridor)
                        { auto pos = corridor - origin; 
                            return glm::vec2(pos.x*-1, pos.y); });
@@ -62,14 +71,31 @@ namespace glimac
         {
             auto wallMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)wall.x, 0.f, (float)wall.y));
             drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, wallMVMatrix);
+            drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, glm::translate(wallMVMatrix, glm::vec3(0.f, -1.f, 0.f)));
         }
         wallTexture.unbind();
+
+        waterTexture.bind();
+
+        for (auto water : waters)
+        {
+            auto waterMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)water.x, 0.f, (float)water.y));
+            drawWater(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, waterMVMatrix);
+        }
+
+        waterTexture.unbind();
 
         ceilingTexture.bind();
 
         // TEXUTRE FOR START
 
         drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
+
+        for (auto water : waters)
+        {
+            auto waterMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)water.x, 0.f, (float)water.y));
+            drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, waterMVMatrix);
+        }
 
         for (auto ceiling : corridors)
         {
@@ -112,7 +138,7 @@ namespace glimac
 
     glm::vec2 MapGenerator::getStartPosition() const { return start; }
 
-    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end(); }
+    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end() || std::find(waters.begin(), waters.end(), pos) != waters.end(); }
 
     glm::vec2 MapGenerator::getFirstDirection() const
     {

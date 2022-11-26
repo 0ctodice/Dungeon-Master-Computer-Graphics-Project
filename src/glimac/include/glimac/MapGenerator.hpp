@@ -18,12 +18,14 @@ namespace glimac
     {
     private:
         std::vector<glm::vec2> walls;
+        std::vector<glm::vec2> waters;
         std::vector<glm::vec2> corridors;
         glm::vec2 start;
         glm::vec2 end;
         PPMParser *map;
         Texture wallTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/wall.png", false};
         Texture groundTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/ground.png", false};
+        Texture waterTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/water.png", false};
         Texture ceilingTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/ceiling.png", false};
 
         void drawWall(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
@@ -59,6 +61,15 @@ namespace glimac
             groundMatrix.rotate(90.f, glm::vec3(1.f, 0.f, 0.f));
             groundMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
             groundMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+            drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, glm::translate(globalMVMatrix, glm::vec3(0.f, -1.f, 0.f)));
+        }
+
+        void drawWater(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        {
+            MatrixManager waterMatrix{globalPMatrix, globalMVMatrix};
+            waterMatrix.rotate(90.f, glm::vec3(1.f, 0.f, 0.f));
+            waterMatrix.translate(glm::vec3(0.f, 0.f, 0.75f));
+            waterMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
         }
 
     public:

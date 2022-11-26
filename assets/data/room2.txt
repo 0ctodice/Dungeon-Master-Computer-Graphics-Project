@@ -1,0 +1,4 @@
+#room2
+room2.ppm
+0
+0
