@@ -111,18 +111,58 @@ namespace glimac
     std::string DataParser::getMapFile() const { return mapFile; }
     std::vector<Treasure> DataParser::getTreasures() const { return treasures; }
     std::vector<Monster> DataParser::getMonsters() const { return monsters; }
-    Treasure *DataParser::findTreasure(glm::vec2 position, glm::vec2 origin)
+
+    void DataParser::updateData(glm::vec2 origin)
     {
-        const auto it = std::find_if(treasures.begin(), treasures.end(), [position, origin](const Treasure &t)
-                                     { return (t.Entity::getPosition().x - origin.x) * -1 == position.x && t.Entity::getPosition().y - origin.y == position.y; });
+        std::transform(monsters.begin(), monsters.end(), monsters.begin(), [origin](Monster &monster)
+                       {
+                        auto pos = monster.getPosition() - origin;
+                        pos.x *=-1;
+                        return Monster{monster.getId(), pos, monster.getName(), monster.getAtk(), monster.getCa(),monster.getPVMax(), monster.getTextureName()}; });
+
+        std::transform(treasures.begin(), treasures.end(), treasures.begin(), [origin](Treasure &treasure)
+                       {
+            auto pos = treasure.getPosition() - origin;
+            pos.x *= -1;
+            return Treasure{treasure.getId(), pos, treasure.getName(), treasure.getType(), treasure.getValue(), treasure.getTextureName()}; });
+    }
+
+    Treasure *DataParser::findTreasure(glm::vec2 position)
+    {
+        const auto it = std::find_if(treasures.begin(), treasures.end(), [position](const Treasure &t)
+                                     { return t.Entity::getPosition().x == position.x && t.Entity::getPosition().y == position.y; });
         if (it == treasures.end())
             return nullptr;
         Treasure *treasurePtr = new Treasure(*it);
         std::cout << "PICKED " << treasurePtr->Entity::getName() << std::endl;
-        treasures.erase(std::remove_if(treasures.begin(), treasures.end(), [position, origin](const Treasure &t)
-                                       { return (t.Entity::getPosition().x - origin.x) * -1 == position.x && t.Entity::getPosition().y - origin.y == position.y; }),
+        treasures.erase(std::remove_if(treasures.begin(), treasures.end(), [position](const Treasure &t)
+                                       { return t.Entity::getPosition().x == position.x && t.Entity::getPosition().y == position.y; }),
                         treasures.end());
 
         return treasurePtr;
+    }
+
+    void DataParser::clean()
+    {
+        std::for_each(monsters.begin(), monsters.end(), [](Monster monster)
+                      { monster.Entity::deleteTexture(); });
+
+        std::for_each(treasures.begin(), treasures.end(), [](Treasure treasure)
+                      { treasure.Entity::deleteTexture(); });
+    }
+
+    void DataParser::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::vec2 origin, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix) const
+    {
+        std::for_each(monsters.begin(), monsters.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &origin, &globalPMatrix, &globalMVMatrix](const Monster &monster)
+                      { monster.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, origin, globalPMatrix, globalMVMatrix); });
+
+        std::for_each(treasures.begin(), treasures.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &origin, &globalPMatrix, &globalMVMatrix](const Treasure &treasure)
+                      { treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, origin, globalPMatrix, globalMVMatrix); });
+    }
+
+    void DataParser::idle(float time, glm::vec2 playerPos)
+    {
+        std::for_each(monsters.begin(), monsters.end(), [&time, &playerPos](Monster &monster)
+                      { monster.updateActions(time, playerPos); });
     }
 }

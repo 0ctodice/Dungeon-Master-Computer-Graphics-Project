@@ -11,6 +11,7 @@ namespace glimac
         int id;
         glm::vec2 position;
         std::string name;
+        std::string textureName;
         Texture texture;
 
     public:
@@ -18,8 +19,10 @@ namespace glimac
         Entity(int id, glm::vec2 pos, std::string name, std::string texture);
         virtual void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::vec2 origin, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const = 0;
         void deleteTexture();
+        int getId() const;
         glm::vec2 getPosition() const;
         std::string getName() const;
-        Texture gettexture() const;
+        Texture getTexture() const;
+        std::string getTextureName() const;
     };
 }

@@ -14,6 +14,7 @@
 #include <glimac/DataParser.hpp>
 #include <glimac/SixAdjacencyCamera.hpp>
 #include <glimac/Player.hpp>
+#include <glimac/Monster.hpp>
 #include <memory>
 
 using namespace glimac;
@@ -61,6 +62,7 @@ int main(int argc, char **argv)
     DataParser data{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
     PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile());
     MapGenerator map(&mapParsed, &windowManager);
+    data.updateData(map.getStartPosition());
 
     // GESTION DES SHADERS
 
@@ -139,6 +141,7 @@ int main(int argc, char **argv)
     glBindVertexArray(0);
 
     Player player;
+    float time = 0.f;
 
     // BOUCLE D'APPLICATION
 
@@ -183,7 +186,7 @@ int main(int argc, char **argv)
             }
             if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
             {
-                Treasure *treasurePtr = data.findTreasure(camera.getFrontTile(), map.getStartPosition());
+                Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
                 // DO SHIT WITH TREASURE
                 if (treasurePtr != nullptr)
                 {
@@ -217,14 +220,13 @@ int main(int argc, char **argv)
         /*********************************
          * HERE SHOULD COME THE RENDERING CODE
          *********************************/
+        time = windowManager.getTime();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
-        for (auto treasure : data.getTreasures())
-        {
-            treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
-        }
+        data.idle(time, camera.getPlayerPosition());
+        data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
         glBindVertexArray(0);
         // Update the display
         windowManager.swapBuffers();
@@ -234,10 +236,8 @@ int main(int argc, char **argv)
 
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
-    for (auto treasure : data.getTreasures())
-    {
-        treasure.Entity::deleteTexture();
-    }
+
+    data.clean();
     map.deleteMap();
 
     return EXIT_SUCCESS;

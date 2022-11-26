@@ -1,4 +1,5 @@
 #room2
 room2.ppm
 0
-0
+1
+1:1:2:slime:1:0:10:slime.png

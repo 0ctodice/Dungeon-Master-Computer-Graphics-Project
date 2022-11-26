@@ -26,7 +26,7 @@ namespace glimac
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::vec2 origin, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const override
         {
             texture.bind();
-            auto mVMatrix = glm::translate(globalMVMatrix, glm::vec3((position.x - origin.x) * -1.f, 0.f, position.y - origin.y));
+            auto mVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)position.x, 0.f, (float)position.y));
             MatrixManager matrix{globalPMatrix, mVMatrix};
             matrix.scale(glm::vec3(.5f));
             matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);

@@ -1,0 +1,5 @@
+#map
+map.ppm
+0
+1
+1:8:7:slime:1:0:10:slime.png
