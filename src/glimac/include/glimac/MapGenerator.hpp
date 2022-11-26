@@ -6,6 +6,7 @@
 #include <glimac/FilePath.hpp>
 #include <glimac/PPMParser.hpp>
 #include <glimac/MatrixManager.hpp>
+#include <glimac/SDLWindowManager.hpp>
 #include <glimac/Texture.hpp>
 #include <stdio.h>
 #include <fstream>
@@ -22,11 +23,15 @@ namespace glimac
         std::vector<glm::vec2> corridors;
         glm::vec2 start;
         glm::vec2 end;
+        float animDoor = 0.f;
         PPMParser *map;
+        SDLWindowManager *window;
+        bool doorOpened = false;
         Texture wallTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/wall.png", false};
         Texture groundTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/ground.png", false};
         Texture waterTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/water.png", false};
         Texture ceilingTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/ceiling.png", false};
+        Texture doorTexture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/door.png", false};
 
         void drawWall(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
         {
@@ -72,14 +77,24 @@ namespace glimac
             waterMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
         }
 
+        void drawDoor(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        {
+            MatrixManager doorMatrix{globalPMatrix, globalMVMatrix};
+            doorMatrix.rotate(90.f, glm::vec3(0.f, 1.f, 0.f));
+            doorMatrix.translate(glm::vec3(0.f, 0.f, -0.5f));
+            doorMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+        }
+
     public:
         MapGenerator() = delete;
-        MapGenerator(PPMParser *mapParsed);
+        MapGenerator(PPMParser *mapParsed, SDLWindowManager *window);
         ~MapGenerator();
-        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const;
+        void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f));
         void deleteMap();
         glm::vec2 getStartPosition() const;
+        glm::vec2 getEndPosition() const;
         bool thereIsAWall(glm::vec2 pos) const;
         glm::vec2 getFirstDirection() const;
+        void openDoor();
     };
 }

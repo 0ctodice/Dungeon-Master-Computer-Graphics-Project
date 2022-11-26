@@ -118,4 +118,6 @@ namespace glimac
 
         return playerPosition + target;
     }
+
+    glm::vec2 SixAdjacencyCamera::getPlayerPosition() const { return playerPosition; }
 }

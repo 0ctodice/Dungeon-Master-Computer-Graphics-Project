@@ -3,7 +3,7 @@
 
 namespace glimac
 {
-    MapGenerator::MapGenerator(PPMParser *mapParsed) : map{mapParsed}
+    MapGenerator::MapGenerator(PPMParser *mapParsed, SDLWindowManager *window) : map{mapParsed}, window(window)
     {
         auto pixels = map->getPixels();
 
@@ -61,20 +61,40 @@ namespace glimac
     MapGenerator::~MapGenerator()
     {
         map = nullptr;
+        window = nullptr;
         delete (map);
+        delete (window);
     }
 
-    void MapGenerator::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix) const
+    void MapGenerator::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix)
     {
         wallTexture.bind();
+
+        auto behindStartWallMVMatrix = glm::translate(globalMVMatrix, glm::vec3(-1.f, 0.f, 0.f));
+        drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, behindStartWallMVMatrix);
+
         for (auto wall : walls)
         {
             auto wallMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)wall.x, 0.f, (float)wall.y));
             drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, wallMVMatrix);
             drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, glm::translate(wallMVMatrix, glm::vec3(0.f, -1.f, 0.f)));
-        }
+        };
+
         wallTexture.unbind();
 
+        // DOOR ANIMATION
+
+        if (doorOpened && animDoor < 1.f)
+        {
+            animDoor += 0.01f * window->getTime();
+        }
+
+        doorTexture.bind();
+
+        auto doorMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x + 1.0f, animDoor, (float)end.y));
+        drawDoor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, doorMVMatrix);
+
+        doorTexture.unbind();
         waterTexture.bind();
 
         for (auto water : waters)
@@ -87,7 +107,7 @@ namespace glimac
 
         ceilingTexture.bind();
 
-        // TEXUTRE FOR START
+        // TEXTURE FOR START
 
         drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
 
@@ -112,7 +132,7 @@ namespace glimac
 
         groundTexture.bind();
 
-        // TEXUTRE FOR START
+        // TEXTURE FOR START
         drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
 
         for (auto ground : corridors)
@@ -133,12 +153,14 @@ namespace glimac
     {
         wallTexture.deleteTexture();
         ceilingTexture.deleteTexture();
+        waterTexture.deleteTexture();
         groundTexture.deleteTexture();
     }
 
     glm::vec2 MapGenerator::getStartPosition() const { return start; }
+    glm::vec2 MapGenerator::getEndPosition() const { return end; }
 
-    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end() || std::find(waters.begin(), waters.end(), pos) != waters.end(); }
+    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end() || std::find(waters.begin(), waters.end(), pos) != waters.end() || (pos == end + glm::vec2(1, 0) && (!doorOpened || animDoor < 1.f)) || pos == glm::vec2(-1, 0); }
 
     glm::vec2 MapGenerator::getFirstDirection() const
     {
@@ -149,5 +171,10 @@ namespace glimac
                : i == map->getHeight() - 1 ? glm::vec2(1.f, 0.f)
                : j == map->getWidth() - 1  ? glm::vec2(0.f, -1.f)
                                            : glm::vec2(0.f);
+    }
+
+    void MapGenerator::openDoor()
+    {
+        doorOpened = true;
     }
 }

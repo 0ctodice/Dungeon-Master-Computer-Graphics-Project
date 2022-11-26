@@ -60,7 +60,7 @@ int main(int argc, char **argv)
     std::string dataFile = argv[1];
     DataParser data{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
     PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile());
-    MapGenerator map(&mapParsed);
+    MapGenerator map(&mapParsed, &windowManager);
 
     // GESTION DES SHADERS
 
@@ -206,6 +206,10 @@ int main(int argc, char **argv)
                         break;
                     }
                     delete (treasurePtr);
+                }
+                else if (camera.getPlayerPosition() == map.getEndPosition())
+                {
+                    map.openDoor();
                 }
             }
         }

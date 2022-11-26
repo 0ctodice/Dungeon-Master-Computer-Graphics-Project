@@ -25,6 +25,7 @@ namespace glimac
         void rotateRight();
 
         glm::vec2 getFrontTile() const;
+        glm::vec2 getPlayerPosition() const;
     };
 
 }
