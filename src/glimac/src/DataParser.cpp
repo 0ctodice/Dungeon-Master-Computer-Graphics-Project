@@ -160,9 +160,9 @@ namespace glimac
                       { treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, origin, globalPMatrix, globalMVMatrix); });
     }
 
-    void DataParser::idle(float time, glm::vec2 playerPos)
+    void DataParser::idle(float time, glm::vec2 playerPos, MapGenerator *map)
     {
-        std::for_each(monsters.begin(), monsters.end(), [&time, &playerPos](Monster &monster)
-                      { monster.updateActions(time, playerPos); });
+        std::for_each(monsters.begin(), monsters.end(), [&time, &playerPos, &map](Monster &monster)
+                      { monster.updateActions(time, playerPos, map); });
     }
 }

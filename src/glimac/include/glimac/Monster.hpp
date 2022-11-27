@@ -2,7 +2,7 @@
 #include "glm.hpp"
 #include <glimac/Entity.hpp>
 #include <glimac/Character.hpp>
-#include <glimac/SDLWindowManager.hpp>
+#include <glimac/MapGenerator.hpp>
 
 namespace glimac
 {
@@ -18,21 +18,79 @@ namespace glimac
             texture.bind();
             auto mVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)position.x, 0.f, (float)position.y));
             MatrixManager matrix{globalPMatrix, mVMatrix};
+            matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             matrix.rotate(90.f, glm::vec3(0.f, 1.f, 0.f));
             matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             texture.unbind();
         }
-        void updateActions(float time, glm::vec2 playerPos)
+        void updateActions(float time, glm::vec2 playerPos, MapGenerator *map)
         {
-            if (time - timeStamp >= 1.f)
+            if (time - timeStamp < 1.f)
             {
-                if (glm::distance2(playerPos, position) <= 21)
-                {
-                    auto vec = glm::normalize(glm::vec2(playerPos.x - position.x, playerPos.y - position.y));
-                    if (position + vec != playerPos)
-                        position += vec;
-                }
-                timeStamp = time;
+                return;
+            }
+
+            timeStamp = time;
+
+            auto distance = glm::distance2(playerPos, position);
+
+            if (distance > 21)
+            {
+                return;
+            }
+
+            std::cout << "distance :" << distance << std::endl;
+
+            if (distance == 1 || distance == 0) // FIGHT PHASE
+            {
+                return;
+            }
+
+            int distX = playerPos.x - position.x;
+            int distY = playerPos.y - position.y;
+
+            std::cout << "distX :" << distX << std::endl;
+            std::cout << "distY :" << distY << std::endl;
+
+            distX = distX > 0 ? 1 : distX < 0 ? -1
+                                              : 0;
+            distY = distY > 0 ? 1 : distY < 0 ? -1
+                                              : 0;
+
+            auto vec = glm::vec2(std::abs(distX) >= std::abs(distY) ? distX : 0, std::abs(distX) >= std::abs(distY) ? 0 : distY);
+
+            if (!map->thereIsAWall(position + vec))
+            {
+                position += vec;
+                std::cout << "target :" << vec << std::endl;
+                return;
+            }
+
+            vec = glm::vec2(std::abs(distX) >= std::abs(distY) ? 0 : distX, std::abs(distX) >= std::abs(distY) ? distY : 0);
+
+            if (!map->thereIsAWall(position + vec))
+            {
+                position += vec;
+                std::cout << "target :" << vec << std::endl;
+                return;
+            }
+
+            vec = glm::vec2(std::abs(distX) >= std::abs(distY) ? -distX : 0, std::abs(distX) >= std::abs(distY) ? 0 : -distY);
+
+            if (!map->thereIsAWall(position + vec))
+            {
+                position += vec;
+                std::cout << "target :" << vec << std::endl;
+                return;
+            }
+
+            vec = glm::vec2(std::abs(distX) >= std::abs(distY) ? 0 : -distX, std::abs(distX) >= std::abs(distY) ? -distY : 0);
+
+            if (!map->thereIsAWall(position + vec))
+            {
+                position += vec;
+                std::cout << "target :" << vec << std::endl;
+                return;
             }
         }
     };

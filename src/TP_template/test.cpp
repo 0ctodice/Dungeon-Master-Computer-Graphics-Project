@@ -225,7 +225,7 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
-        data.idle(time, camera.getPlayerPosition());
+        data.idle(time, camera.getPlayerPosition(), &map);
         data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
         glBindVertexArray(0);
         // Update the display
