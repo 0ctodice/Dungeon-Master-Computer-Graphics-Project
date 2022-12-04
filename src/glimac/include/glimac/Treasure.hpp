@@ -29,13 +29,15 @@ namespace glimac
             auto mVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)position.x, 0.f, (float)position.y));
             MatrixManager matrix{globalPMatrix, mVMatrix};
             matrix.scale(glm::vec3(.5f));
-            matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
-            matrix.rotate(90.f, glm::vec3(0.f, 1.F, 0.f));
+            matrix.rotate(rotation, glm::vec3(0.f, 1.f, 0.f));
             matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             texture.unbind();
+        }
+        void updateActions(float time, SixAdjacencyCamera *player, MapGenerator *map) override
+        {
+            Entity::updateActions(time, player, map);
         }
         TreasureType getType() const;
         int getValue() const;
     };
-
 }

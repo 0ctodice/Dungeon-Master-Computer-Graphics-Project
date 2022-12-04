@@ -8,6 +8,7 @@ namespace glimac
     {
     private:
         int orientation;
+        int initOrientation;
         glm::mat4 *globalMVMatrix;
         glm::vec2 playerPosition{0};
         MapGenerator *map;

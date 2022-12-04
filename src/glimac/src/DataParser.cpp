@@ -122,9 +122,9 @@ namespace glimac
 
         std::transform(treasures.begin(), treasures.end(), treasures.begin(), [origin](Treasure &treasure)
                        {
-            auto pos = treasure.getPosition() - origin;
-            pos.x *= -1;
-            return Treasure{treasure.getId(), pos, treasure.getName(), treasure.getType(), treasure.getValue(), treasure.getTextureName()}; });
+                        auto pos = treasure.getPosition() - origin;
+                        pos.x *= -1;
+                        return Treasure{treasure.getId(), pos, treasure.getName(), treasure.getType(), treasure.getValue(), treasure.getTextureName()}; });
     }
 
     Treasure *DataParser::findTreasure(glm::vec2 position)
@@ -160,9 +160,11 @@ namespace glimac
                       { treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, origin, globalPMatrix, globalMVMatrix); });
     }
 
-    void DataParser::idle(float time, glm::vec2 playerPos, MapGenerator *map)
+    void DataParser::idle(float time, SixAdjacencyCamera *player, MapGenerator *map)
     {
-        std::for_each(monsters.begin(), monsters.end(), [&time, &playerPos, &map](Monster &monster)
-                      { monster.updateActions(time, playerPos, map); });
+        std::for_each(treasures.begin(), treasures.end(), [&time, &player, &map](Treasure &treasure)
+                      { treasure.updateActions(time, player, map); });
+        std::for_each(monsters.begin(), monsters.end(), [&time, &player, &map](Monster &monster)
+                      { monster.updateActions(time, player, map); });
     }
 }

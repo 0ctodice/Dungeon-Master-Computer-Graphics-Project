@@ -68,6 +68,20 @@ namespace glimac
 
     void MapGenerator::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix)
     {
+        // DOOR ANIMATION
+
+        if (doorOpened && animDoor < 1.f)
+        {
+            animDoor += 0.005f * window->getTime();
+        }
+
+        doorTexture.bind();
+
+        auto doorMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x + 1.0f, animDoor, (float)end.y));
+        drawDoor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, doorMVMatrix);
+
+        doorTexture.unbind();
+
         wallTexture.bind();
 
         auto behindStartWallMVMatrix = glm::translate(globalMVMatrix, glm::vec3(-1.f, 0.f, 0.f));
@@ -82,19 +96,6 @@ namespace glimac
 
         wallTexture.unbind();
 
-        // DOOR ANIMATION
-
-        if (doorOpened && animDoor < 1.f)
-        {
-            animDoor += 0.01f * window->getTime();
-        }
-
-        doorTexture.bind();
-
-        auto doorMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x + 1.0f, animDoor, (float)end.y));
-        drawDoor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, doorMVMatrix);
-
-        doorTexture.unbind();
         waterTexture.bind();
 
         for (auto water : waters)

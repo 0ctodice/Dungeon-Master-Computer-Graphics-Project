@@ -5,9 +5,10 @@ namespace glimac
 {
     SixAdjacencyCamera::SixAdjacencyCamera(glm::vec2 playerDirection, glm::mat4 *MVMatrix, MapGenerator *map) : globalMVMatrix{MVMatrix}, map{map}
     {
-        orientation = playerDirection.y == 1.f ? 0 : playerDirection.y == -1.f ? 2
-                                                 : playerDirection.x == 1.f    ? 3
-                                                                               : 1;
+        initOrientation = playerDirection.y == 1.f ? 0 : playerDirection.y == -1.f ? 2
+                                                     : playerDirection.x == 1.f    ? 3
+                                                                                   : 1;
+        orientation = initOrientation;
     }
 
     SixAdjacencyCamera::~SixAdjacencyCamera()
