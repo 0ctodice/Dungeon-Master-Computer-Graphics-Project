@@ -142,6 +142,14 @@ namespace glimac
         return treasurePtr;
     }
 
+    Monster *DataParser::findMonster(glm::vec2 position)
+    {
+        auto it = std::find_if(monsters.begin(), monsters.end(), [position](const Monster &m)
+                               { return m.Entity::getPosition().x == position.x && m.Entity::getPosition().y == position.y; });
+
+        return it == monsters.end() ? nullptr : &(*it);
+    }
+
     void DataParser::clean()
     {
         std::for_each(monsters.begin(), monsters.end(), [](Monster monster)
@@ -151,19 +159,29 @@ namespace glimac
                       { treasure.Entity::deleteTexture(); });
     }
 
-    void DataParser::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::vec2 origin, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix) const
+    void DataParser::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix) const
     {
-        std::for_each(monsters.begin(), monsters.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &origin, &globalPMatrix, &globalMVMatrix](const Monster &monster)
-                      { monster.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, origin, globalPMatrix, globalMVMatrix); });
+        std::for_each(monsters.begin(), monsters.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Monster &monster)
+                      { monster.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix); });
 
-        std::for_each(treasures.begin(), treasures.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &origin, &globalPMatrix, &globalMVMatrix](const Treasure &treasure)
-                      { treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, origin, globalPMatrix, globalMVMatrix); });
+        std::for_each(treasures.begin(), treasures.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Treasure &treasure)
+                      { treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix); });
     }
 
     void DataParser::idle(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map)
     {
+        monsters.erase(std::remove_if(monsters.begin(), monsters.end(), [](Monster &m)
+                                      {
+                                        if(m.isDead()) {
+                                            m.deleteTexture();
+                                            return true;
+                                        }
+                                        return false; }),
+                       monsters.end());
+
         std::for_each(treasures.begin(), treasures.end(), [&time, &player, &camera, &map](Treasure &treasure)
                       { treasure.updateActions(time, player, camera, map); });
+
         std::for_each(monsters.begin(), monsters.end(), [&time, &player, &camera, &map](Monster &monster)
                       { monster.updateActions(time, player, camera, map); });
     }

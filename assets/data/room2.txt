@@ -2,4 +2,4 @@
 room2.ppm
 0
 1
-1:1:2:slime:1:0:10:slime.png
+1:1:2:slime:2:0:10:slime.png

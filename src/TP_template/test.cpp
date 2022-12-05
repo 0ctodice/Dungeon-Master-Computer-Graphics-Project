@@ -186,6 +186,7 @@ int main(int argc, char **argv)
             if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
             {
                 Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
+                Monster *monsterPtr = data.findMonster(camera.getFrontTile());
                 // DO SHIT WITH TREASURE
                 if (treasurePtr != nullptr)
                 {
@@ -209,6 +210,10 @@ int main(int argc, char **argv)
                     }
                     delete (treasurePtr);
                 }
+                else if (monsterPtr != nullptr)
+                {
+                    monsterPtr->takeDamage(player.getAtk());
+                }
                 else if (camera.getPlayerPosition() == map.getEndPosition())
                 {
                     map.openDoor();
@@ -225,7 +230,7 @@ int main(int argc, char **argv)
         glBindVertexArray(vao);
         data.idle(time, &player, &camera, &map);
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
-        data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
+        data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
         glBindVertexArray(0);
         // Update the display
         windowManager.swapBuffers();

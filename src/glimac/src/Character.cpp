@@ -16,6 +16,10 @@ namespace glimac
         pvMax += value;
         pv = pvMax;
     }
-    void Character::takeDamage(int value) { pv -= value; }
+    void Character::takeDamage(int value)
+    {
+        pv -= (value - ca);
+        std::cout << "current pv : " << pv << std::endl;
+    }
     bool Character::isDead() const { return pv <= 0; }
 }
