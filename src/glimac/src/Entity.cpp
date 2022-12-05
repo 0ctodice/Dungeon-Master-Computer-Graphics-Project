@@ -3,7 +3,7 @@
 
 namespace glimac
 {
-    Entity::Entity(int id, glm::vec2 pos, std::string name, std::string texture) : id{id}, position{pos}, name{name}, textureName{texture}, texture{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/" + texture, false} {}
+    Entity::Entity(int id, glm::vec2 pos, std::string name, std::string texture) : id{id}, position{pos}, name{name}, textureName{texture}, texture{texture, false} {}
     void Entity::updateActions(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map)
     {
         auto newPos = position - camera->getPlayerPosition();

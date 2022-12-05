@@ -2,6 +2,7 @@
 
 #include "glm.hpp"
 #include <glimac/Character.hpp>
+#include <glimac/Inventory.hpp>
 #include <iostream>
 
 namespace glimac
@@ -9,11 +10,15 @@ namespace glimac
     class Player : public Character
     {
     private:
-        int money = 0;
+        Inventory inventory{};
 
     public:
-        Player(int atk = 1, int ca = 1, int pv = 20);
+        Player();
         int getMoney() const;
+        Treasure getOffensive() const;
+        Treasure getdefensive() const;
+        void setOffensive(Treasure t);
+        void setDefensive(Treasure t);
         void setMoney(int value);
         void displayInfos() const;
     };

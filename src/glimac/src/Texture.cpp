@@ -5,9 +5,14 @@ namespace glimac
 {
     Texture::Texture(std::string path, bool antialiasing)
     {
+        if (path == "")
+        {
+            return;
+        }
+
         std::unique_ptr<Image> texturePtr;
 
-        if ((texturePtr = loadImage(FilePath(path))) == NULL)
+        if ((texturePtr = loadImage(FilePath("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/textures/" + path))) == NULL)
         {
             std::cerr << "TEXTURE NOT LOADED" << std::endl;
         }

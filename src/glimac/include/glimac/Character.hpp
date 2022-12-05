@@ -13,7 +13,7 @@ namespace glimac
         int atk;
 
     public:
-        Character() = delete;
+        Character();
         Character(int atk, int ca, int pv);
         int getAtk() const;
         int getCa() const;

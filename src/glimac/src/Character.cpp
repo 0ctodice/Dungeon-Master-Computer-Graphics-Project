@@ -3,6 +3,7 @@
 
 namespace glimac
 {
+    Character::Character() : atk{0}, ca{0}, pvMax{20}, pv{20} {}
     Character::Character(int atk, int ca, int pv) : atk{atk}, ca{ca}, pvMax{pv}, pv{pv} {}
     int Character::getAtk() const { return atk; }
     int Character::getCa() const { return ca; }

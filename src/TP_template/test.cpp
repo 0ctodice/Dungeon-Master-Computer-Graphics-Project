@@ -202,10 +202,10 @@ int main(int argc, char **argv)
                         player.setPVMax(treasurePtr->getValue());
                         break;
                     case 4:
-                        player.setAtk(treasurePtr->getValue());
+                        player.setOffensive(*treasurePtr);
                         break;
                     case 5:
-                        player.setCa(treasurePtr->getValue());
+                        player.setDefensive(*treasurePtr);
                         break;
                     }
                     delete (treasurePtr);
