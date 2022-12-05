@@ -1,5 +1,6 @@
 #pragma once
 #include "glm.hpp"
+#include "iostream"
 
 namespace glimac
 {
@@ -22,6 +23,9 @@ namespace glimac
         void setCa(int value);
         void setPV(int value);
         void setPVMax(int value);
+
+        void takeDamage(int value);
+        bool isDead() const;
     };
 
 }

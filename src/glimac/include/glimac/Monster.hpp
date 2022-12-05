@@ -23,9 +23,9 @@ namespace glimac
             texture.unbind();
         }
 
-        void updateActions(float time, SixAdjacencyCamera *player, MapGenerator *map) override
+        void updateActions(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map) override
         {
-            Entity::updateActions(time, player, map);
+            Entity::updateActions(time, player, camera, map);
 
             if (time - timeStamp < 1.f)
             {
@@ -34,7 +34,7 @@ namespace glimac
 
             timeStamp = time;
 
-            auto playerPos = player->getPlayerPosition();
+            auto playerPos = camera->getPlayerPosition();
 
             auto distance = glm::distance2(playerPos, position);
 
@@ -45,6 +45,7 @@ namespace glimac
 
             if (distance == 1 || distance == 0) // FIGHT PHASE
             {
+                player->takeDamage(atk);
                 return;
             }
 

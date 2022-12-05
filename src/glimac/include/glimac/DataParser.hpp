@@ -11,6 +11,7 @@
 #include <glimac/Monster.hpp>
 #include <glimac/MapGenerator.hpp>
 #include <glimac/SixAdjacencyCamera.hpp>
+#include <glimac/Character.hpp>
 
 namespace glimac
 {
@@ -43,6 +44,6 @@ namespace glimac
         void updateData(glm::vec2 origin);
         void clean();
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::vec2 origin, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const;
-        void idle(float time, SixAdjacencyCamera *player, MapGenerator *map);
+        void idle(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map);
     };
 }

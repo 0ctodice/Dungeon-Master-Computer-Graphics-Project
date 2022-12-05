@@ -11,13 +11,10 @@ uniform vec3 uLightPos;
 
 out vec4 fFragColor;
 
-vec3 tint=vec3(109.f/255.f,48.f/255.f,194.f/255.f);
-
-vec2 uv=vPosition_vs.xy/vec2(1920,1080);
-float tintPow=.5f;
-
 vec3 c1=vec3(.4039,.349,.8235);
 vec3 c2=vec3(.8235,.349,.349);
+
+float tintPow=.3f;
 
 void main(){
     float light=min(1.f/pow(distance(uLightPos,vPosition_vs),2.f),1.f);

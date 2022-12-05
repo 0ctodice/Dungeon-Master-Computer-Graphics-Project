@@ -33,9 +33,9 @@ namespace glimac
             matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             texture.unbind();
         }
-        void updateActions(float time, SixAdjacencyCamera *player, MapGenerator *map) override
+        void updateActions(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map) override
         {
-            Entity::updateActions(time, player, map);
+            Entity::updateActions(time, player, camera, map);
         }
         TreasureType getType() const;
         int getValue() const;

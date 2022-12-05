@@ -223,7 +223,7 @@ int main(int argc, char **argv)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
-        data.idle(time, &camera, &map);
+        data.idle(time, &player, &camera, &map);
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
         data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, map.getStartPosition(), &globalProjectionMatrix, globalMVMatrix);
         glBindVertexArray(0);
