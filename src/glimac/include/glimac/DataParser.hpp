@@ -43,6 +43,7 @@ namespace glimac
         Treasure *findTreasure(glm::vec2 position);
         Monster *findMonster(glm::vec2 position);
         void updateData(glm::vec2 origin);
+        void addTreasure(Treasure t);
         void clean();
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const;
         void idle(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map);

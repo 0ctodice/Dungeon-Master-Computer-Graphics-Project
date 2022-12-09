@@ -150,6 +150,8 @@ namespace glimac
         return it == monsters.end() ? nullptr : &(*it);
     }
 
+    void DataParser::addTreasure(Treasure t) { treasures.emplace_back(t); }
+
     void DataParser::clean()
     {
         std::for_each(monsters.begin(), monsters.end(), [](Monster monster)

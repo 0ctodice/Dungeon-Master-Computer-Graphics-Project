@@ -201,11 +201,28 @@ int main(int argc, char **argv)
                         player.setPVMax(treasurePtr->getValue());
                         break;
                     case 4:
+                    {
+                        auto old = player.getOffensive();
+                        if (old.getName() != "fist")
+                        {
+                            old.setPosition(treasurePtr->getPosition());
+                            data.addTreasure(old);
+                        }
+
                         player.setOffensive(*treasurePtr);
                         break;
+                    }
                     case 5:
+                    {
+                        auto old = player.getDefensive();
+                        if (old.getName() != "skin")
+                        {
+                            old.setPosition(treasurePtr->getPosition());
+                            data.addTreasure(old);
+                        }
                         player.setDefensive(*treasurePtr);
                         break;
+                    }
                     }
                     delete (treasurePtr);
                 }
