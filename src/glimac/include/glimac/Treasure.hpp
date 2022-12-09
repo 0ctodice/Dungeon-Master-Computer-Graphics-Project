@@ -39,5 +39,6 @@ namespace glimac
         }
         TreasureType getType() const;
         int getValue() const;
+        void setPosition(glm::vec2 pos);
     };
 }

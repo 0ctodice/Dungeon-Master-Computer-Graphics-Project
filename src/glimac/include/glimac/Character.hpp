@@ -15,8 +15,8 @@ namespace glimac
     public:
         Character();
         Character(int atk, int ca, int pv);
-        int getAtk() const;
-        int getCa() const;
+        virtual int getAtk() const;
+        virtual int getCa() const;
         int getPV() const;
         int getPVMax() const;
         void setAtk(int value);

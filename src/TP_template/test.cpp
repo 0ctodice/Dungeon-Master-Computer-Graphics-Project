@@ -187,7 +187,6 @@ int main(int argc, char **argv)
             {
                 Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
                 Monster *monsterPtr = data.findMonster(camera.getFrontTile());
-                // DO SHIT WITH TREASURE
                 if (treasurePtr != nullptr)
                 {
                     switch (treasurePtr->getType())
