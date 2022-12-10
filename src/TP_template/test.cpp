@@ -15,6 +15,7 @@
 #include <glimac/SixAdjacencyCamera.hpp>
 #include <glimac/Player.hpp>
 #include <glimac/Monster.hpp>
+#include <glimac/HUD.hpp>
 #include <memory>
 
 using namespace glimac;
@@ -31,9 +32,11 @@ struct Vertex3DText
 
 int main(int argc, char **argv)
 {
-
     const int WINDOW_WIDTH = 1920;
     const int WINDOW_HEIGHT = 1080;
+    const float RESIZE = 26.6;
+    const float GAME_ZONE_WIDTH = WINDOW_WIDTH - 16 * RESIZE;
+    const float GAME_ZONE_HEIGHT = WINDOW_HEIGHT - 9 * RESIZE;
 
     // Initialize SDL and open a window
     SDLWindowManager windowManager(WINDOW_WIDTH, WINDOW_HEIGHT, "GLImac");
@@ -55,6 +58,7 @@ int main(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_SCISSOR_TEST);
 
     // GENERATION DE LA MAP
     std::string dataFile = argv[1];
@@ -83,7 +87,9 @@ int main(int argc, char **argv)
     // CREATION DES MATRIX
 
     glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
+    glm::mat4 hudProjectionMatrix = glm::scale(glm::mat4{1.f}, glm::vec3{1.f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.f});
     glm::mat4 globalMVMatrix = glm::mat4(1.f);
+    glm::mat4 hudMVMatrix{1.f};
 
     auto playerDirection = map.getFirstDirection();
     auto angle = 90.f * playerDirection.x + 180.f * (playerDirection.y > 0);
@@ -94,6 +100,10 @@ int main(int argc, char **argv)
 
     SixAdjacencyCamera camera{playerDirection, &globalMVMatrix, &map};
 
+    // CREATION DU HUD
+
+    HUD hud{WINDOW_WIDTH, WINDOW_HEIGHT};
+
     // CREATION DES BUFFERS
 
     const GLuint VERTEX_ATTR_POSITION = 0;
@@ -102,6 +112,7 @@ int main(int argc, char **argv)
 
     GLuint vbo;
     GLuint vao;
+    GLuint fbo;
 
     auto quadNormal = glm::cross(glm::vec3(-.5f, -.5f, 0.f), glm::vec3(.5f, .5f, 0.f));
 
@@ -240,25 +251,38 @@ int main(int argc, char **argv)
         /*********************************
          * HERE SHOULD COME THE RENDERING CODE
          *********************************/
-        time = windowManager.getTime();
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        time = windowManager.getTime();
         glBindVertexArray(vao);
+        hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
+        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+        glViewport(0, 0, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
+        // glScissor(0, 0, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
+
         data.idle(time, &player, &camera, &map);
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
         data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
+
+        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        // glScissor(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+        // DRAW HUD
+
         glBindVertexArray(0);
+
         // Update the display
         windowManager.swapBuffers();
     }
 
     // NETTOYAGE
-
+    glDeleteFramebuffers(GL_DRAW_FRAMEBUFFER, &fbo);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
 
     data.clean();
     map.deleteMap();
+    hud.deleteTexture();
 
     return EXIT_SUCCESS;
 }
