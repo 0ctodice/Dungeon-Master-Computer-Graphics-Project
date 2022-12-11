@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     const float GAME_ZONE_HEIGHT = WINDOW_HEIGHT - 9 * RESIZE;
 
     // Initialize SDL and open a window
-    SDLWindowManager windowManager(WINDOW_WIDTH, WINDOW_HEIGHT, "GLImac");
+    SDLWindowManager windowManager(WINDOW_WIDTH, WINDOW_HEIGHT, "Dungeon Master");
 
     // Initialize glew for OpenGL3+ support
     GLenum glewInitError = glewInit();
@@ -257,17 +257,14 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         time = windowManager.getTime();
         glBindVertexArray(vao);
-        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+
         glViewport(0, 0, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
-        // glScissor(0, 0, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
 
         data.idle(time, &player, &camera, &map);
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
         data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
 
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        // glScissor(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
         // DRAW HUD
         hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);

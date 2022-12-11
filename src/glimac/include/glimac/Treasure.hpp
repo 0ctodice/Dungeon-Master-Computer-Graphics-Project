@@ -28,6 +28,7 @@ namespace glimac
             texture.bind();
             auto mVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)position.x, 0.f, (float)position.y));
             MatrixManager matrix{globalPMatrix, mVMatrix};
+            matrix.rotate(rotation, glm::vec3(0.f, 1.f, 0.f));
             switch (type)
             {
             case MONEY:
@@ -39,7 +40,6 @@ namespace glimac
                 matrix.scale(glm::vec3(.5f, .5f, 0.f));
                 break;
             }
-            matrix.rotate(rotation, glm::vec3(0.f, 1.f, 0.f));
             matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
             texture.unbind();
         }
