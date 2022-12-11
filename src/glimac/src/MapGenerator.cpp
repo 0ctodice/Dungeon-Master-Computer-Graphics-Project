@@ -150,7 +150,7 @@ namespace glimac
         groundTexture.unbind();
     }
 
-    void MapGenerator::deleteMap()
+    void MapGenerator::clean()
     {
         wallTexture.deleteTexture();
         ceilingTexture.deleteTexture();

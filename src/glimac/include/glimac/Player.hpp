@@ -24,7 +24,9 @@ namespace glimac
         Treasure getDefensive() const;
         void setOffensive(Treasure t);
         void setDefensive(Treasure t);
+        std::pair<Treasure, Treasure> *getInventory();
         void setMoney(int value);
         void displayInfos() const;
+        void clean();
     };
 }

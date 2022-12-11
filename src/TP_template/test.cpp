@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 {
     const int WINDOW_WIDTH = 1920;
     const int WINDOW_HEIGHT = 1080;
-    const float RESIZE = 26.6;
+    const float RESIZE = 25;
     const float GAME_ZONE_WIDTH = WINDOW_WIDTH - 16 * RESIZE;
     const float GAME_ZONE_HEIGHT = WINDOW_HEIGHT - 9 * RESIZE;
 
@@ -100,9 +100,13 @@ int main(int argc, char **argv)
 
     SixAdjacencyCamera camera{playerDirection, &globalMVMatrix, &map};
 
+    // CREATION DU PLAYER
+
+    Player player;
+
     // CREATION DU HUD
 
-    HUD hud{WINDOW_WIDTH, WINDOW_HEIGHT};
+    HUD hud{WINDOW_WIDTH, WINDOW_HEIGHT, player.getInventory(), .25f};
 
     // CREATION DES BUFFERS
 
@@ -150,7 +154,6 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    Player player;
     float time = 0.f;
 
     // BOUCLE D'APPLICATION
@@ -254,7 +257,6 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         time = windowManager.getTime();
         glBindVertexArray(vao);
-        hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
         glViewport(0, 0, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
         // glScissor(0, 0, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
@@ -268,6 +270,7 @@ int main(int argc, char **argv)
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
         // DRAW HUD
+        hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
 
         glBindVertexArray(0);
 
@@ -280,9 +283,9 @@ int main(int argc, char **argv)
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
 
+    hud.clean();
     data.clean();
-    map.deleteMap();
-    hud.deleteTexture();
+    map.clean();
 
     return EXIT_SUCCESS;
 }

@@ -27,11 +27,11 @@ namespace glimac
         PPMParser *map;
         SDLWindowManager *window;
         bool doorOpened = false;
-        Texture wallTexture{"wall.png", true};
-        Texture groundTexture{"ground.png", true};
-        Texture waterTexture{"water.png", true};
-        Texture ceilingTexture{"ceiling.png", true};
-        Texture doorTexture{"door.png", true};
+        Texture wallTexture{"dungeon/wall.png", true};
+        Texture groundTexture{"dungeon/ground.png", true};
+        Texture waterTexture{"dungeon/water.png", true};
+        Texture ceilingTexture{"dungeon/ceiling.png", true};
+        Texture doorTexture{"dungeon/door.png", true};
 
         void drawWall(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
         {
@@ -90,7 +90,7 @@ namespace glimac
         MapGenerator(PPMParser *mapParsed, SDLWindowManager *window);
         ~MapGenerator();
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f));
-        void deleteMap();
+        void clean();
         glm::vec2 getStartPosition() const;
         glm::vec2 getEndPosition() const;
         bool thereIsAWall(glm::vec2 pos) const;

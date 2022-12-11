@@ -1,10 +1,10 @@
 #room
 room.ppm
 6
-1:1:1:tune:1:120:argent.png
-2:1:3:katana:4:20:katana.png
-3:2:1:shield:5:15:shield.png
-4:2:3:popotte:2:10:HP.png
-5:1:2:popotteMax:3:10:maxHP.png
-6:2:2:poorKatana:4:10:poorKatana.png
+1:1:1:tune:1:120:dungeon/coin.png
+2:1:3:sword:4:20:sword/sword004.png
+3:2:1:shield:5:15:shield/shield020.png
+4:2:3:popotte:2:10:dungeon/health.png
+5:1:2:popotteMax:3:10:dungeon/maxhealth.png
+6:2:2:poorKatana:4:10:sword/sword020.png
 0

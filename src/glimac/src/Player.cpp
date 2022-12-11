@@ -22,6 +22,7 @@ namespace glimac
         inventory.second = t;
         setCa(inventory.second.getValue());
     }
+    std::pair<Treasure, Treasure> *Player::getInventory() { return &inventory; }
     void Player::displayInfos() const
     {
         std::cout << "-----------------" << std::endl;
@@ -33,5 +34,11 @@ namespace glimac
         std::cout << "defensive : " << inventory.second.getName() << std::endl;
         std::cout << "ca : " << ca << std::endl;
         std::cout << "-----------------" << std::endl;
+    }
+
+    void Player::clean()
+    {
+        inventory.first.deleteTexture();
+        inventory.second.deleteTexture();
     }
 }
