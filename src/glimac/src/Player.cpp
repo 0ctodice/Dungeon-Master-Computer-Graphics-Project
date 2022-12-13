@@ -8,7 +8,7 @@ namespace glimac
         setAtk(inventory.first.getValue());
         setCa(inventory.second.getValue());
     }
-    int Player::getMoney() const { return money; }
+    int *Player::getMoney() { return &money; }
     void Player::setMoney(int value) { money += value; }
     Treasure Player::getOffensive() const { return inventory.first; }
     Treasure Player::getDefensive() const { return inventory.second; }

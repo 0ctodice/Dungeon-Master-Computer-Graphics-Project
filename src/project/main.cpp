@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 
     // CREATION DU HUD
 
-    HUD hud{WINDOW_WIDTH, WINDOW_HEIGHT, player.getInventory(), .25f};
+    HUD hud{WINDOW_WIDTH, WINDOW_HEIGHT, player.getInventory(), player.getMoney()};
 
     // CREATION DES BUFFERS
 
