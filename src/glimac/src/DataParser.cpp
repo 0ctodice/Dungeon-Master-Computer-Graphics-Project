@@ -163,15 +163,16 @@ namespace glimac
 
     void DataParser::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix) const
     {
-        std::for_each(monsters.begin(), monsters.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Monster &monster)
-                      { monster.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix); });
+        std::for_each(monsters.begin(), monsters.end(), [this, &uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Monster &monster)
+                      { if(checkDistance(monster.getPosition())){monster.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);} });
 
-        std::for_each(treasures.begin(), treasures.end(), [&uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Treasure &treasure)
-                      { treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix); });
+        std::for_each(treasures.begin(), treasures.end(), [this, &uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Treasure &treasure)
+                      { if(checkDistance(treasure.getPosition())){treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);} });
     }
 
     void DataParser::idle(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map)
     {
+        playerPosition = camera->getPlayerPosition();
         monsters.erase(std::remove_if(monsters.begin(), monsters.end(), [](Monster &m)
                                       {
                                         if(m.isDead()) {

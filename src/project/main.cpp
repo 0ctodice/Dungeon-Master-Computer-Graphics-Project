@@ -32,11 +32,10 @@ struct Vertex3DText
 
 int main(int argc, char **argv)
 {
-    const int WINDOW_WIDTH = 1920;
-    const int WINDOW_HEIGHT = 1080;
-    const float RESIZE = 25;
-    const float GAME_ZONE_WIDTH = WINDOW_WIDTH - 16 * RESIZE;
-    const float GAME_ZONE_HEIGHT = WINDOW_HEIGHT - 9 * RESIZE;
+    const int WINDOW_WIDTH = 1280;
+    const int WINDOW_HEIGHT = 900;
+    const float GAME_ZONE_WIDTH = 1280;
+    const float GAME_ZONE_HEIGHT = 720;
 
     // Initialize SDL and open a window
     SDLWindowManager windowManager(WINDOW_WIDTH, WINDOW_HEIGHT, "Dungeon Master");
@@ -86,7 +85,7 @@ int main(int argc, char **argv)
 
     // CREATION DES MATRIX
 
-    glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, .1f, 100.f);
+    glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)GAME_ZONE_WIDTH / (float)GAME_ZONE_HEIGHT, .1f, 100.f);
     glm::mat4 hudProjectionMatrix = glm::scale(glm::mat4{1.f}, glm::vec3{1.f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.f});
     glm::mat4 globalMVMatrix = glm::mat4(1.f);
     glm::mat4 hudMVMatrix{1.f};
@@ -169,7 +168,7 @@ int main(int argc, char **argv)
             {
                 done = true; // Leave the loop after this iteration
             }
-            if (e.type == SDL_KEYDOWN)
+            if (e.type == SDL_KEYDOWN && !player.isDead())
             {
                 glm::vec2 target;
                 switch (e.key.keysym.sym)
@@ -197,7 +196,7 @@ int main(int argc, char **argv)
                     break;
                 }
             }
-            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
+            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT && !player.isDead())
             {
                 Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
                 Monster *monsterPtr = data.findMonster(camera.getFrontTile());
@@ -258,9 +257,10 @@ int main(int argc, char **argv)
         time = windowManager.getTime();
         glBindVertexArray(vao);
 
-        glViewport(0, 0, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
+        glViewport(0, WINDOW_HEIGHT - GAME_ZONE_HEIGHT, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
 
         data.idle(time, &player, &camera, &map);
+        map.idle(camera.getPlayerPosition());
         map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
         data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
 

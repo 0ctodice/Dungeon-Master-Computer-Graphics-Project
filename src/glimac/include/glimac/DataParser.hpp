@@ -25,12 +25,18 @@ namespace glimac
         std::vector<Treasure> treasures;
         int nbMonster;
         std::vector<Monster> monsters;
-
+        glm::vec2 playerPosition;
         int parseInt(std::ifstream *file)
         {
             std::string parser;
             std::getline(*file, parser, ':');
             return std::stoi(parser);
+        }
+
+        bool checkDistance(glm::vec2 pos) const
+        {
+            auto dst = glm::distance2(playerPosition, pos);
+            return dst < 21 && dst >= 0;
         }
 
     public:

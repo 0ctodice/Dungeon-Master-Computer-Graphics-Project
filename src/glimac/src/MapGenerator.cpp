@@ -66,32 +66,46 @@ namespace glimac
         delete (window);
     }
 
-    void MapGenerator::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix)
+    void MapGenerator::idle(glm::vec2 playerPos)
     {
-        // DOOR ANIMATION
+        playerPosition = playerPos;
 
         if (doorOpened && animDoor < 1.f)
         {
             animDoor += 0.005f * window->getTime();
         }
+    }
 
-        doorTexture.bind();
+    void MapGenerator::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix)
+    {
 
-        auto doorMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x + 1.0f, animDoor, (float)end.y));
-        drawDoor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, doorMVMatrix);
+        if (checkDistance(end))
+        {
+            doorTexture.bind();
 
-        doorTexture.unbind();
+            auto doorMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x + 1.0f, animDoor, (float)end.y));
+            drawDoor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, doorMVMatrix);
+
+            doorTexture.unbind();
+        }
 
         wallTexture.bind();
 
-        auto behindStartWallMVMatrix = glm::translate(globalMVMatrix, glm::vec3(-1.f, 0.f, 0.f));
-        drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, behindStartWallMVMatrix);
+        if (checkDistance(glm::vec2(-1.f, 0.f)))
+        {
+
+            auto behindStartWallMVMatrix = glm::translate(globalMVMatrix, glm::vec3(-1.f, 0.f, 0.f));
+            drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, behindStartWallMVMatrix);
+        }
 
         for (auto wall : walls)
         {
-            auto wallMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)wall.x, 0.f, (float)wall.y));
-            drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, wallMVMatrix);
-            drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, glm::translate(wallMVMatrix, glm::vec3(0.f, -1.f, 0.f)));
+            if (checkDistance(wall))
+            {
+                auto wallMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)wall.x, 0.f, (float)wall.y));
+                drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, wallMVMatrix);
+                drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, glm::translate(wallMVMatrix, glm::vec3(0.f, -1.f, 0.f)));
+            }
         };
 
         wallTexture.unbind();
@@ -100,8 +114,11 @@ namespace glimac
 
         for (auto water : waters)
         {
-            auto waterMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)water.x, 0.f, (float)water.y));
-            drawWater(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, waterMVMatrix);
+            if (checkDistance(water))
+            {
+                auto waterMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)water.x, 0.f, (float)water.y));
+                drawWater(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, waterMVMatrix);
+            }
         }
 
         waterTexture.unbind();
@@ -109,44 +126,62 @@ namespace glimac
         ceilingTexture.bind();
 
         // TEXTURE FOR START
-
-        drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
+        if (checkDistance(start))
+        {
+            drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
+        }
 
         for (auto water : waters)
         {
-            auto waterMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)water.x, 0.f, (float)water.y));
-            drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, waterMVMatrix);
+            if (checkDistance(water))
+            {
+                auto waterMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)water.x, 0.f, (float)water.y));
+                drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, waterMVMatrix);
+            }
         }
 
         for (auto ceiling : corridors)
         {
-            auto ceilingMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)ceiling.x, 0.f, (float)ceiling.y));
-            drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, ceilingMVMatrix);
+            if (checkDistance(ceiling))
+            {
+                auto ceilingMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)ceiling.x, 0.f, (float)ceiling.y));
+                drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, ceilingMVMatrix);
+            }
         }
 
         // TEXTURE FOR END
 
-        auto ceilingMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x, 0.f, (float)end.y));
-        drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, ceilingMVMatrix);
-
+        if (checkDistance(end))
+        {
+            auto ceilingMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x, 0.f, (float)end.y));
+            drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, ceilingMVMatrix);
+        }
         ceilingTexture.unbind();
 
         groundTexture.bind();
 
         // TEXTURE FOR START
-        drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
+        if (checkDistance(start))
+        {
+            drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
+        }
 
         for (auto ground : corridors)
         {
-            auto groundMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)ground.x, 0.f, (float)ground.y));
-            drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, groundMVMatrix);
+            if (checkDistance(ground))
+            {
+                auto groundMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)ground.x, 0.f, (float)ground.y));
+                drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, groundMVMatrix);
+            }
         }
 
         // TEXTURE FOR END
 
-        auto groundMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x, 0.f, (float)end.y));
-        drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, groundMVMatrix);
-
+        if (checkDistance(end))
+        {
+            auto groundMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x, 0.f, (float)end.y));
+            drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, groundMVMatrix);
+        }
         groundTexture.unbind();
     }
 

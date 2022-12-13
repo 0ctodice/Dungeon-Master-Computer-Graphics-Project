@@ -23,6 +23,7 @@ namespace glimac
         std::vector<glm::vec2> corridors;
         glm::vec2 start;
         glm::vec2 end;
+        glm::vec2 playerPosition;
         float animDoor = 0.f;
         PPMParser *map;
         SDLWindowManager *window;
@@ -85,10 +86,17 @@ namespace glimac
             doorMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
         }
 
+        bool checkDistance(glm::vec2 pos)
+        {
+            auto dst = glm::distance2(playerPosition, pos);
+            return dst < 21 && dst >= 0;
+        }
+
     public:
         MapGenerator() = delete;
         MapGenerator(PPMParser *mapParsed, SDLWindowManager *window);
         ~MapGenerator();
+        void idle(glm::vec2 playerPos);
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f));
         void clean();
         glm::vec2 getStartPosition() const;
