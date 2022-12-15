@@ -309,7 +309,7 @@ int main(int argc, char **argv)
             {
                 game = DEATH;
             }
-            if (camera.getPlayerPosition() - map.getEndPosition() == map.getFirstDirection())
+            if (camera.getPlayerPosition() == map.getDoorPosition())
             {
                 std::cout << "WINNER !" << std::endl;
                 game = WINNING;

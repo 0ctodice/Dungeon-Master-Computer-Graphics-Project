@@ -1,5 +1,5 @@
 #map
-map4.ppm
+map5.ppm
 0
 1
 1:8:7:slime:2:0:10:slime.png

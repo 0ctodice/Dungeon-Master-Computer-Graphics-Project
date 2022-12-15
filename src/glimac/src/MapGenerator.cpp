@@ -54,8 +54,32 @@ namespace glimac
                        { auto pos = corridor - origin; 
                            return glm::vec2(pos.x*-1, pos.y); });
 
+        if (end.x == 0)
+        {
+            doorOrientation = 90.f;
+            doorPosition = glm::vec2(end.x - 1, end.y);
+        }
+        else if (end.y == 0)
+        {
+            doorOrientation = 180.f;
+            doorPosition = glm::vec2(end.x, end.y - 1);
+        }
+        else if (end.x > end.y)
+        {
+            doorOrientation = 90.f;
+            doorPosition = glm::vec2(end.x + 1, end.y);
+        }
+        else
+        {
+            doorOrientation = 0.f;
+            doorPosition = glm::vec2(end.x, end.y + 1);
+        }
+
         end -= start;
         end = glm::vec2(end.x * -1, end.y);
+
+        doorPosition -= start;
+        doorPosition.x *= -1;
     }
 
     MapGenerator::~MapGenerator()
@@ -198,7 +222,7 @@ namespace glimac
     glm::vec2 MapGenerator::getStartPosition() const { return start; }
     glm::vec2 MapGenerator::getEndPosition() const { return end; }
 
-    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end() || std::find(waters.begin(), waters.end(), pos) != waters.end() || (pos == end + getFirstDirection() && (!doorOpened || animDoor < 1.f)) || pos == glm::vec2(-1) * getFirstDirection(); }
+    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end() || std::find(waters.begin(), waters.end(), pos) != waters.end() || (pos == doorPosition && (!doorOpened || animDoor < 1.f)) || pos == glm::vec2(-1) * getFirstDirection(); }
 
     glm::vec2 MapGenerator::getFirstDirection() const
     {
@@ -215,4 +239,6 @@ namespace glimac
     {
         doorOpened = true;
     }
+
+    glm::vec2 MapGenerator::getDoorPosition() { return doorPosition; }
 }
