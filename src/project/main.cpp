@@ -30,8 +30,18 @@ struct Vertex3DText
     Vertex3DText(glm::vec3 pos, glm::vec3 nor, glm::vec3 tex) : position{pos}, normal{nor}, textureCoord{tex} {}
 };
 
+enum GAMESTATE
+{
+    STARTING_SCREEN,
+    PLAYING,
+    DEATH,
+    WINNING,
+};
+
 int main(int argc, char **argv)
 {
+    GAMESTATE game = STARTING_SCREEN;
+
     const int WINDOW_WIDTH = 1280;
     const int WINDOW_HEIGHT = 900;
     const float GAME_ZONE_WIDTH = 1280;
@@ -57,14 +67,6 @@ int main(int argc, char **argv)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // glEnable(GL_SCISSOR_TEST);
-
-    // GENERATION DE LA MAP
-    std::string dataFile = argv[1];
-    DataParser data{"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
-    PPMParser mapParsed("/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile());
-    MapGenerator map(&mapParsed, &windowManager);
-    data.updateData(map.getStartPosition());
 
     // GESTION DES SHADERS
 
@@ -82,22 +84,6 @@ int main(int argc, char **argv)
     GLint uNormalMatrixLocation = glGetUniformLocation(program.getGLId(), "uNormalMatrix");
     GLint uTextureLocation = glGetUniformLocation(program.getGLId(), "uTexture");
     GLint uLightPosLocation = glGetUniformLocation(program.getGLId(), "uLightPos");
-
-    // CREATION DES MATRIX
-
-    glm::mat4 globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)GAME_ZONE_WIDTH / (float)GAME_ZONE_HEIGHT, .1f, 100.f);
-    glm::mat4 hudProjectionMatrix = glm::scale(glm::mat4{1.f}, glm::vec3{1.f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.f});
-    glm::mat4 globalMVMatrix = glm::mat4(1.f);
-    glm::mat4 hudMVMatrix{1.f};
-
-    auto playerDirection = map.getFirstDirection();
-    auto angle = 90.f * playerDirection.x + 180.f * (playerDirection.y > 0);
-
-    globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(angle), glm::vec3(0.f, 1.f, 0.f));
-
-    // CREATION DE LA CAMERA
-
-    SixAdjacencyCamera camera{playerDirection, &globalMVMatrix, &map};
 
     // CREATION DU PLAYER
 
@@ -153,126 +139,189 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    float time = 0.f;
+    // ELEMENTS DE BASE
 
+    std::string dataFile;
+    DataParser data;
+    PPMParser mapParsed;
+    MapGenerator map;
+    SixAdjacencyCamera camera;
+
+    glm::mat4 globalProjectionMatrix;
+    glm::mat4 hudProjectionMatrix;
+    glm::mat4 globalMVMatrix;
+    glm::mat4 hudMVMatrix;
+
+    glm::vec2 playerDirection;
+    float angle;
+
+    float time;
     // BOUCLE D'APPLICATION
 
     bool done = false;
     while (!done)
     {
-        // Event loop:
-        SDL_Event e;
-        while (windowManager.pollEvent(e))
+
+        switch (game)
         {
-            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
-            {
-                done = true; // Leave the loop after this iteration
-            }
-            if (e.type == SDL_KEYDOWN && !player.isDead())
-            {
-                glm::vec2 target;
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_z:
-                    camera.moveFront();
-                    break;
-                case SDLK_s:
-                    camera.moveBack();
-                    break;
-                case SDLK_q:
-                    camera.moveLeft();
-                    break;
-                case SDLK_d:
-                    camera.moveRight();
-                    break;
-                case SDLK_a:
-                    camera.rotateLeft();
-                    break;
-                case SDLK_e:
-                    camera.rotateRight();
-                    break;
-                case SDLK_i:
-                    player.displayInfos();
-                    break;
-                }
-            }
-            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT && !player.isDead())
-            {
-                Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
-                Monster *monsterPtr = data.findMonster(camera.getFrontTile());
-                if (treasurePtr != nullptr)
-                {
-                    switch (treasurePtr->getType())
-                    {
-                    case 1:
-                        player.setMoney(treasurePtr->getValue());
-                        break;
-                    case 2:
-                        player.setPV(treasurePtr->getValue());
-                        break;
-                    case 3:
-                        player.setPVMax(treasurePtr->getValue());
-                        break;
-                    case 4:
-                    {
-                        auto old = player.getOffensive();
-                        if (old.getName() != "fist")
-                        {
-                            old.setPosition(treasurePtr->getPosition());
-                            data.addTreasure(old);
-                        }
+        case STARTING_SCREEN:
+            // GENERATION DE LA MAP
+            dataFile = argv[1];
+            data = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
+            mapParsed = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile()};
+            map = {&mapParsed, &windowManager};
+            data.updateData(map.getStartPosition());
 
-                        player.setOffensive(*treasurePtr);
-                        break;
-                    }
-                    case 5:
+            // CREATION DES MATRIX
+
+            globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)GAME_ZONE_WIDTH / (float)GAME_ZONE_HEIGHT, .1f, 100.f);
+            hudProjectionMatrix = glm::scale(glm::mat4{1.f}, glm::vec3{1.f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.f});
+            globalMVMatrix = glm::mat4{1.f};
+            hudMVMatrix = glm::mat4{1.f};
+
+            playerDirection = map.getFirstDirection();
+            angle = 90.f * playerDirection.x + 180.f * (playerDirection.y > 0);
+
+            globalMVMatrix = glm::rotate(globalMVMatrix, glm::radians(angle), glm::vec3(0.f, 1.f, 0.f));
+
+            // CREATION DE LA CAMERA
+
+            camera = {playerDirection, &globalMVMatrix, &map};
+
+            time = 0.f;
+            game = PLAYING;
+            break;
+        case PLAYING:
+            // Event loop:
+            SDL_Event e;
+            while (windowManager.pollEvent(e))
+            {
+                if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
+                {
+                    done = true; // Leave the loop after this iteration
+                }
+                if (e.type == SDL_KEYDOWN && !player.isDead())
+                {
+                    glm::vec2 target;
+                    switch (e.key.keysym.sym)
                     {
-                        auto old = player.getDefensive();
-                        if (old.getName() != "skin")
-                        {
-                            old.setPosition(treasurePtr->getPosition());
-                            data.addTreasure(old);
-                        }
-                        player.setDefensive(*treasurePtr);
+                    case SDLK_z:
+                        camera.moveFront();
+                        break;
+                    case SDLK_s:
+                        camera.moveBack();
+                        break;
+                    case SDLK_q:
+                        camera.moveLeft();
+                        break;
+                    case SDLK_d:
+                        camera.moveRight();
+                        break;
+                    case SDLK_a:
+                        camera.rotateLeft();
+                        break;
+                    case SDLK_e:
+                        camera.rotateRight();
+                        break;
+                    case SDLK_i:
+                        player.displayInfos();
                         break;
                     }
+                }
+                if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT && !player.isDead())
+                {
+                    Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
+                    Monster *monsterPtr = data.findMonster(camera.getFrontTile());
+                    if (treasurePtr != nullptr)
+                    {
+                        switch (treasurePtr->getType())
+                        {
+                        case 1:
+                            player.setMoney(treasurePtr->getValue());
+                            break;
+                        case 2:
+                            player.setPV(treasurePtr->getValue());
+                            break;
+                        case 3:
+                            player.setPVMax(treasurePtr->getValue());
+                            break;
+                        case 4:
+                        {
+                            auto old = player.getOffensive();
+                            if (old.getName() != "fist")
+                            {
+                                old.setPosition(treasurePtr->getPosition());
+                                data.addTreasure(old);
+                            }
+
+                            player.setOffensive(*treasurePtr);
+                            break;
+                        }
+                        case 5:
+                        {
+                            auto old = player.getDefensive();
+                            if (old.getName() != "skin")
+                            {
+                                old.setPosition(treasurePtr->getPosition());
+                                data.addTreasure(old);
+                            }
+                            player.setDefensive(*treasurePtr);
+                            break;
+                        }
+                        }
+                        delete (treasurePtr);
                     }
-                    delete (treasurePtr);
-                }
-                else if (monsterPtr != nullptr)
-                {
-                    monsterPtr->takeDamage(player.getAtk());
-                }
-                else if (camera.getPlayerPosition() == map.getEndPosition())
-                {
-                    map.openDoor();
+                    else if (monsterPtr != nullptr)
+                    {
+                        monsterPtr->takeDamage(player.getAtk());
+                    }
+                    else if (camera.getPlayerPosition() == map.getEndPosition())
+                    {
+                        map.openDoor();
+                    }
                 }
             }
+
+            /*********************************
+             * HERE SHOULD COME THE RENDERING CODE
+             *********************************/
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            time = windowManager.getTime();
+            glBindVertexArray(vao);
+
+            glViewport(0, WINDOW_HEIGHT - GAME_ZONE_HEIGHT, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
+
+            data.idle(time, &player, &camera, &map);
+            map.idle(camera.getPlayerPosition());
+            map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
+            data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
+
+            glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+            // DRAW HUD
+            hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
+
+            glBindVertexArray(0);
+
+            // Update the display
+            windowManager.swapBuffers();
+            if (player.isDead())
+            {
+                game = DEATH;
+            }
+            if (camera.getPlayerPosition() - map.getEndPosition() == map.getFirstDirection())
+            {
+                std::cout << "WINNER !" << std::endl;
+                game = WINNING;
+            }
+            break;
+        case DEATH:
+            done = true;
+            break;
+        case WINNING:
+            done = true;
+            break;
         }
-
-        /*********************************
-         * HERE SHOULD COME THE RENDERING CODE
-         *********************************/
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        time = windowManager.getTime();
-        glBindVertexArray(vao);
-
-        glViewport(0, WINDOW_HEIGHT - GAME_ZONE_HEIGHT, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
-
-        data.idle(time, &player, &camera, &map);
-        map.idle(camera.getPlayerPosition());
-        map.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
-        data.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &globalProjectionMatrix, globalMVMatrix);
-
-        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        // DRAW HUD
-        hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
-
-        glBindVertexArray(0);
-
-        // Update the display
-        windowManager.swapBuffers();
     }
 
     // NETTOYAGE

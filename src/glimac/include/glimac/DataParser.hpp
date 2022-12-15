@@ -40,7 +40,7 @@ namespace glimac
         }
 
     public:
-        DataParser() = delete;
+        DataParser() {}
         DataParser(std::string path);
         std::string getLevelName() const;
         std::string getMapFile() const;

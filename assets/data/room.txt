@@ -6,5 +6,5 @@ room.ppm
 3:2:1:shield:5:15:shield/shield020.png
 4:2:3:popotte:2:10:dungeon/health.png
 5:1:2:popotteMax:3:10:dungeon/maxhealth.png
-6:2:2:poorKatana:4:999:sword/sword020.png
+6:2:2:poorKatana:4:999:sword/sword015.png
 0

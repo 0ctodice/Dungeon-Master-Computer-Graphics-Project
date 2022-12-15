@@ -36,7 +36,7 @@ namespace glimac
         }
 
     public:
-        PPMParser() = delete;
+        PPMParser() {}
         PPMParser(std::string path);
 
         int getWidth() const;

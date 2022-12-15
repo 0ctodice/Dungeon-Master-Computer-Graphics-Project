@@ -83,7 +83,7 @@ namespace glimac
         {
             doorTexture.bind();
 
-            auto doorMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x + 1.0f, animDoor, (float)end.y));
+            auto doorMVMatrix = glm::translate(globalMVMatrix, glm::vec3((float)end.x, animDoor, (float)end.y));
             drawDoor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, doorMVMatrix);
 
             doorTexture.unbind();
@@ -91,10 +91,12 @@ namespace glimac
 
         wallTexture.bind();
 
-        if (checkDistance(glm::vec2(-1.f, 0.f)))
+        auto behind = glm::vec2{-1} * getFirstDirection();
+
+        if (checkDistance(behind))
         {
 
-            auto behindStartWallMVMatrix = glm::translate(globalMVMatrix, glm::vec3(-1.f, 0.f, 0.f));
+            auto behindStartWallMVMatrix = glm::translate(globalMVMatrix, glm::vec3(behind.x, 0.f, behind.y));
             drawWall(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, behindStartWallMVMatrix);
         }
 
@@ -126,7 +128,7 @@ namespace glimac
         ceilingTexture.bind();
 
         // TEXTURE FOR START
-        if (checkDistance(start))
+        if (checkDistance(glm::vec2{0.f}))
         {
             drawCeilling(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
         }
@@ -161,7 +163,7 @@ namespace glimac
         groundTexture.bind();
 
         // TEXTURE FOR START
-        if (checkDistance(start))
+        if (checkDistance(glm::vec2{0.f}))
         {
             drawFloor(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);
         }
@@ -196,7 +198,7 @@ namespace glimac
     glm::vec2 MapGenerator::getStartPosition() const { return start; }
     glm::vec2 MapGenerator::getEndPosition() const { return end; }
 
-    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end() || std::find(waters.begin(), waters.end(), pos) != waters.end() || (pos == end + glm::vec2(1, 0) && (!doorOpened || animDoor < 1.f)) || pos == glm::vec2(-1, 0); }
+    bool MapGenerator::thereIsAWall(glm::vec2 pos) const { return std::find(walls.begin(), walls.end(), pos) != walls.end() || std::find(waters.begin(), waters.end(), pos) != waters.end() || (pos == end + getFirstDirection() && (!doorOpened || animDoor < 1.f)) || pos == glm::vec2(-1) * getFirstDirection(); }
 
     glm::vec2 MapGenerator::getFirstDirection() const
     {

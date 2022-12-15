@@ -14,7 +14,7 @@ namespace glimac
         MapGenerator *map;
 
     public:
-        SixAdjacencyCamera() = delete;
+        SixAdjacencyCamera() {}
         SixAdjacencyCamera(glm::vec2 playerDirection, glm::mat4 *MVMatrix, MapGenerator *map);
         ~SixAdjacencyCamera();
 
