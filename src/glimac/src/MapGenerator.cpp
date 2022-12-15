@@ -66,7 +66,7 @@ namespace glimac
         }
         else if (end.x > end.y)
         {
-            doorOrientation = 90.f;
+            doorOrientation = -90.f;
             doorPosition = glm::vec2(end.x + 1, end.y);
         }
         else

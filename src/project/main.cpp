@@ -162,6 +162,96 @@ int main(int argc, char **argv)
     while (!done)
     {
 
+        // Event loop:
+        SDL_Event e;
+        while (windowManager.pollEvent(e))
+        {
+            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
+            {
+                done = true; // Leave the loop after this iteration
+            }
+            if (e.type == SDL_KEYDOWN && game == PLAYING)
+            {
+                glm::vec2 target;
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_z:
+                    camera.moveFront();
+                    break;
+                case SDLK_s:
+                    camera.moveBack();
+                    break;
+                case SDLK_q:
+                    camera.moveLeft();
+                    break;
+                case SDLK_d:
+                    camera.moveRight();
+                    break;
+                case SDLK_a:
+                    camera.rotateLeft();
+                    break;
+                case SDLK_e:
+                    camera.rotateRight();
+                    break;
+                case SDLK_i:
+                    player.displayInfos();
+                    break;
+                }
+            }
+            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT && game == PLAYING)
+            {
+                Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
+                Monster *monsterPtr = data.findMonster(camera.getFrontTile());
+                if (treasurePtr != nullptr)
+                {
+                    switch (treasurePtr->getType())
+                    {
+                    case 1:
+                        player.setMoney(treasurePtr->getValue());
+                        break;
+                    case 2:
+                        player.setPV(treasurePtr->getValue());
+                        break;
+                    case 3:
+                        player.setPVMax(treasurePtr->getValue());
+                        break;
+                    case 4:
+                    {
+                        auto old = player.getOffensive();
+                        if (old.getName() != "fist")
+                        {
+                            old.setPosition(treasurePtr->getPosition());
+                            data.addTreasure(old);
+                        }
+
+                        player.setOffensive(*treasurePtr);
+                        break;
+                    }
+                    case 5:
+                    {
+                        auto old = player.getDefensive();
+                        if (old.getName() != "skin")
+                        {
+                            old.setPosition(treasurePtr->getPosition());
+                            data.addTreasure(old);
+                        }
+                        player.setDefensive(*treasurePtr);
+                        break;
+                    }
+                    }
+                    delete (treasurePtr);
+                }
+                else if (monsterPtr != nullptr)
+                {
+                    monsterPtr->takeDamage(player.getAtk());
+                }
+                else if (camera.getPlayerPosition() == map.getEndPosition())
+                {
+                    map.openDoor();
+                }
+            }
+        }
+
         switch (game)
         {
         case STARTING_SCREEN:
@@ -192,96 +282,6 @@ int main(int argc, char **argv)
             game = PLAYING;
             break;
         case PLAYING:
-            // Event loop:
-            SDL_Event e;
-            while (windowManager.pollEvent(e))
-            {
-                if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE))
-                {
-                    done = true; // Leave the loop after this iteration
-                }
-                if (e.type == SDL_KEYDOWN && !player.isDead())
-                {
-                    glm::vec2 target;
-                    switch (e.key.keysym.sym)
-                    {
-                    case SDLK_z:
-                        camera.moveFront();
-                        break;
-                    case SDLK_s:
-                        camera.moveBack();
-                        break;
-                    case SDLK_q:
-                        camera.moveLeft();
-                        break;
-                    case SDLK_d:
-                        camera.moveRight();
-                        break;
-                    case SDLK_a:
-                        camera.rotateLeft();
-                        break;
-                    case SDLK_e:
-                        camera.rotateRight();
-                        break;
-                    case SDLK_i:
-                        player.displayInfos();
-                        break;
-                    }
-                }
-                if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT && !player.isDead())
-                {
-                    Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
-                    Monster *monsterPtr = data.findMonster(camera.getFrontTile());
-                    if (treasurePtr != nullptr)
-                    {
-                        switch (treasurePtr->getType())
-                        {
-                        case 1:
-                            player.setMoney(treasurePtr->getValue());
-                            break;
-                        case 2:
-                            player.setPV(treasurePtr->getValue());
-                            break;
-                        case 3:
-                            player.setPVMax(treasurePtr->getValue());
-                            break;
-                        case 4:
-                        {
-                            auto old = player.getOffensive();
-                            if (old.getName() != "fist")
-                            {
-                                old.setPosition(treasurePtr->getPosition());
-                                data.addTreasure(old);
-                            }
-
-                            player.setOffensive(*treasurePtr);
-                            break;
-                        }
-                        case 5:
-                        {
-                            auto old = player.getDefensive();
-                            if (old.getName() != "skin")
-                            {
-                                old.setPosition(treasurePtr->getPosition());
-                                data.addTreasure(old);
-                            }
-                            player.setDefensive(*treasurePtr);
-                            break;
-                        }
-                        }
-                        delete (treasurePtr);
-                    }
-                    else if (monsterPtr != nullptr)
-                    {
-                        monsterPtr->takeDamage(player.getAtk());
-                    }
-                    else if (camera.getPlayerPosition() == map.getEndPosition())
-                    {
-                        map.openDoor();
-                    }
-                }
-            }
-
             /*********************************
              * HERE SHOULD COME THE RENDERING CODE
              *********************************/
