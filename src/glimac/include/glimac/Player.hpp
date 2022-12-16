@@ -4,7 +4,6 @@
 #include <utility>
 #include <glimac/Character.hpp>
 #include <glimac/Treasure.hpp>
-// #include <glimac/Inventory.hpp>
 #include <iostream>
 
 namespace glimac

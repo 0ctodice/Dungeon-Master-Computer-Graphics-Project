@@ -1,10 +1,10 @@
 #NS
 5
-NS.ppm
-NW.ppm
-SE.ppm
-WN.ppm
-WS.ppm
+NS.ppm:0
+NW.ppm:0
+SE.ppm:0
+WN.ppm:0
+WS.ppm:0
 0
 0
 0

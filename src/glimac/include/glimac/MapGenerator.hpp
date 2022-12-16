@@ -12,15 +12,32 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <map>
+#include <set>
+#include <glimac/Tile.hpp>
 
 namespace glimac
 {
+    enum TILETYPE
+    {
+        WALL_N,
+        WALL_S,
+        WALL_W,
+        WALL_E,
+        WATER,
+        FLOOR,
+        CEILING
+    };
+
     class MapGenerator
     {
     private:
-        std::vector<glm::vec2> walls;
-        std::vector<glm::vec2> waters;
-        std::vector<glm::vec2> corridors;
+        std::set<Tile> wallN;
+        std::set<Tile> wallS;
+        std::set<Tile> wallE;
+        std::set<Tile> wallW;
+        std::set<Tile> water;
+        std::set<Tile> floor;
         glm::vec2 start;
         glm::vec2 end;
         glm::vec2 playerPosition;
@@ -35,6 +52,37 @@ namespace glimac
         Texture waterTexture{"dungeon/water.png", true};
         Texture ceilingTexture{"dungeon/ceiling.png", true};
         Texture doorTexture{"dungeon/door.png", true};
+
+        void drawWallN(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        {
+            MatrixManager wallMatrix{globalPMatrix, globalMVMatrix};
+            wallMatrix.rotate(270.f, glm::vec3(0.f, 1.f, 0.f));
+            wallMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
+            wallMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+        }
+
+        void drawWallS(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        {
+            MatrixManager wallMatrix{globalPMatrix, globalMVMatrix};
+            wallMatrix.rotate(90.f, glm::vec3(0.f, 1.f, 0.f));
+            wallMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
+            wallMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+        }
+
+        void drawWallE(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        {
+            MatrixManager wallMatrix{globalPMatrix, globalMVMatrix};
+            wallMatrix.rotate(180.f, glm::vec3(0.f, 1.f, 0.f));
+            wallMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
+            wallMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+        }
+
+        void drawWallW(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        {
+            MatrixManager wallMatrix{globalPMatrix, globalMVMatrix};
+            wallMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
+            wallMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+        }
 
         void drawWall(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
         {
@@ -55,7 +103,7 @@ namespace glimac
             wall4Matrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
         }
 
-        void drawCeilling(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
+        void drawCeiling(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const
         {
             MatrixManager ceilingMatrix{globalPMatrix, globalMVMatrix};
             ceilingMatrix.rotate(-90.f, glm::vec3(1.f, 0.f, 0.f));
@@ -76,7 +124,7 @@ namespace glimac
         {
             MatrixManager waterMatrix{globalPMatrix, globalMVMatrix};
             waterMatrix.rotate(90.f, glm::vec3(1.f, 0.f, 0.f));
-            waterMatrix.translate(glm::vec3(0.f, 0.f, 0.75f));
+            waterMatrix.translate(glm::vec3(0.f, 0.f, 0.5f));
             waterMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
         }
 
