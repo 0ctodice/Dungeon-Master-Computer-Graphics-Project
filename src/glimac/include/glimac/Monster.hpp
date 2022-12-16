@@ -9,9 +9,11 @@ namespace glimac
     {
     private:
         float timeStamp = 0.f;
+        float actionTime = 0.f;
+        int value = 0;
 
     public:
-        Monster(int id, glm::vec2 pos, std::string name, int atk, int ca, int pv, std::string texture) : Entity{id, pos, name, texture}, Character{atk, ca, pv} {}
+        Monster(int id, glm::vec2 pos, int lvl, std::string name, int atk, int ca, int pv, float actTime, int val, std::string texture) : Entity{id, pos, lvl, name, texture}, Character{atk, ca, pv}, actionTime{actTime}, value{val} {}
 
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const override
         {
@@ -27,7 +29,7 @@ namespace glimac
         {
             Entity::updateActions(time, player, camera, map);
 
-            if (time - timeStamp < 1.f)
+            if (time - timeStamp < actionTime)
             {
                 return;
             }
@@ -89,5 +91,8 @@ namespace glimac
                 return;
             }
         }
+
+        float getActionTime() const { return actionTime; }
+        int getValue() const { return value; }
     };
 }

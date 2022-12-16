@@ -22,7 +22,7 @@ namespace glimac
 
     public:
         Treasure() = delete;
-        Treasure(int id, glm::vec2 pos, std::string name, int type, int value, std::string texture);
+        Treasure(int id, glm::vec2 pos, int lvl, std::string name, int type, int value, std::string texture);
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f)) const override
         {
             texture.bind();

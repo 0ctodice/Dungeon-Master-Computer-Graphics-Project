@@ -3,6 +3,97 @@
 
 namespace glimac
 {
+    void MapGenerator::setWindowManager(SDLWindowManager *wind)
+    {
+        window = wind;
+    }
+    void MapGenerator::setMapToParsed(PPMParser *mapParsed)
+    {
+        map = mapParsed;
+
+        walls.clear();
+        waters.clear();
+        corridors.clear();
+
+        animDoor = 0.f;
+        doorOpened = false;
+
+        auto pixels = map->getPixels();
+
+        for (int i = 0; i < map->getHeight(); i++)
+        {
+            for (int j = 0; j < map->getWidth(); j++)
+            {
+                auto pixel = pixels[i * map->getWidth() + j];
+
+                if (pixel == RGB(0, 0, 0))
+                {
+                    walls.push_back(glm::vec2(i, j));
+                    continue;
+                }
+                if (pixel == RGB(0, 0, 255))
+                {
+                    waters.push_back(glm::vec2(i, j));
+                    continue;
+                }
+                if (pixel == RGB(255, 255, 255))
+                {
+                    corridors.push_back(glm::vec2(i, j));
+                    continue;
+                }
+                if (pixel == RGB(255, 0, 0))
+                {
+                    start = glm::vec2(i, j);
+                    continue;
+                }
+                if (pixel == RGB(0, 255, 0))
+                {
+                    end = glm::vec2(i, j);
+                    continue;
+                }
+            }
+        }
+        auto origin = start;
+
+        std::transform(walls.begin(), walls.end(), walls.begin(), [origin](glm::vec2 wall)
+                       { auto pos = wall - origin;
+                           return glm::vec2(pos.x*-1, pos.y); });
+
+        std::transform(waters.begin(), waters.end(), waters.begin(), [origin](glm::vec2 water)
+                       { auto pos = water - origin;
+                           return glm::vec2(pos.x*-1, pos.y); });
+
+        std::transform(corridors.begin(), corridors.end(), corridors.begin(), [origin](glm::vec2 corridor)
+                       { auto pos = corridor - origin; 
+                           return glm::vec2(pos.x*-1, pos.y); });
+
+        if (end.x == 0)
+        {
+            doorOrientation = 90.f;
+            doorPosition = glm::vec2(end.x - 1, end.y);
+        }
+        else if (end.y == 0)
+        {
+            doorOrientation = 180.f;
+            doorPosition = glm::vec2(end.x, end.y - 1);
+        }
+        else if (end.x > end.y)
+        {
+            doorOrientation = -90.f;
+            doorPosition = glm::vec2(end.x + 1, end.y);
+        }
+        else
+        {
+            doorOrientation = 0.f;
+            doorPosition = glm::vec2(end.x, end.y + 1);
+        }
+
+        end -= start;
+        end = glm::vec2(end.x * -1, end.y);
+
+        doorPosition -= start;
+        doorPosition.x *= -1;
+    }
     MapGenerator::MapGenerator(PPMParser *mapParsed, SDLWindowManager *window) : map{mapParsed}, window(window)
     {
         auto pixels = map->getPixels();

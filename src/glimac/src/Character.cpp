@@ -19,7 +19,9 @@ namespace glimac
     }
     void Character::takeDamage(int value)
     {
-        pv -= (value - ca);
+        int tank = ca - value;
+        if (tank < 0)
+            pv += tank;
         std::cout << "current pv : " << pv << std::endl;
     }
     bool Character::isDead() const { return pv <= 0; }

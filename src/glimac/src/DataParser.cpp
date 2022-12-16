@@ -13,12 +13,27 @@ namespace glimac
             return;
         }
         // RECUP DATA
-        std::getline(file, levelName);
-        levelName = levelName.substr(1);
-        std::getline(file, mapFile);
+        std::getline(file, commentaire);
+        commentaire = commentaire.substr(1);
 
         std::string parser;
         std::getline(file, parser);
+
+        int nbLevels = std::stoi(parser);
+        parser = "";
+
+        for (int i = 0; i < nbLevels; i++)
+        {
+            std::string tmp;
+            std::getline(file, tmp);
+            mapFiles.push_back(tmp);
+        }
+
+        std::getline(file, parser);
+        goal = std::stoi(parser);
+        parser = "";
+        std::getline(file, parser);
+
         nbTreasure = std::stoi(parser);
         parser = "";
 
@@ -28,6 +43,7 @@ namespace glimac
             int x = parseInt(&file);
             int y = parseInt(&file);
             glm::vec2 position{x, y};
+            int lvl = parseInt(&file);
             std::string name;
             std::getline(file, name, ':');
             std::getline(file, parser, ':');
@@ -36,7 +52,7 @@ namespace glimac
             int value = parseInt(&file);
             std::string texture;
             std::getline(file, texture);
-            Treasure treasure{id, position, name, type, value, texture};
+            Treasure treasure{id, position, lvl, name, type, value, texture};
             treasures.push_back(treasure);
         }
 
@@ -48,44 +64,52 @@ namespace glimac
         {
             int id = parseInt(&file);
             glm::vec2 position{parseInt(&file), parseInt(&file)};
+            int lvl = parseInt(&file);
             std::string name;
             std::getline(file, name, ':');
             int atk = parseInt(&file);
             int ca = parseInt(&file);
             int pv = parseInt(&file);
+            float actionTime = parseFloat(&file);
+            int value = parseInt(&file);
             std::string texture;
             std::getline(file, texture);
-            Monster monster{id, position, name, atk, ca, pv, texture};
+            Monster monster{id, position, lvl, name, atk, ca, pv, actionTime, value, texture};
             monsters.push_back(monster);
         }
 
         file.close();
     }
 
-    std::string DataParser::getLevelName() const { return levelName; }
-    std::string DataParser::getMapFile() const { return mapFile; }
+    std::string DataParser::getMapFile() const { return mapFiles[currentLevel]; }
     std::vector<Treasure> DataParser::getTreasures() const { return treasures; }
     std::vector<Monster> DataParser::getMonsters() const { return monsters; }
 
     void DataParser::updateData(glm::vec2 origin)
     {
-        std::transform(monsters.begin(), monsters.end(), monsters.begin(), [origin](Monster &monster)
+        std::transform(monsters.begin(), monsters.end(), monsters.begin(), [this, origin](Monster &monster)
                        {
+                        if(monster.getLevelStage() != getCurrentLevel()){
+                            return monster;
+                        }
                         auto pos = monster.getPosition() - origin;
                         pos.x *=-1;
-                        return Monster{monster.getId(), pos, monster.getName(), monster.getAtk(), monster.getCa(),monster.getPVMax(), monster.getTextureName()}; });
+                        return Monster{monster.getId(), pos, monster.getLevelStage(), monster.getName(), monster.getAtk(), monster.getCa(),monster.getPVMax(), monster.getActionTime(), monster.getValue(), monster.getTextureName()}; });
 
-        std::transform(treasures.begin(), treasures.end(), treasures.begin(), [origin](Treasure &treasure)
+        std::transform(treasures.begin(), treasures.end(), treasures.begin(), [this, origin](Treasure &treasure)
                        {
+                        if(treasure.getLevelStage() != getCurrentLevel()){
+                            return treasure;
+                        }
                         auto pos = treasure.getPosition() - origin;
                         pos.x *= -1;
-                        return Treasure{treasure.getId(), pos, treasure.getName(), treasure.getType(), treasure.getValue(), treasure.getTextureName()}; });
+                        return Treasure{treasure.getId(), pos, treasure.getLevelStage(), treasure.getName(), treasure.getType(), treasure.getValue(), treasure.getTextureName()}; });
     }
 
     Treasure *DataParser::findTreasure(glm::vec2 position)
     {
-        const auto it = std::find_if(treasures.begin(), treasures.end(), [position](const Treasure &t)
-                                     { return t.Entity::getPosition().x == position.x && t.Entity::getPosition().y == position.y; });
+        const auto it = std::find_if(treasures.begin(), treasures.end(), [this, position](const Treasure &t)
+                                     { return t.getLevelStage() == getCurrentLevel() && t.Entity::getPosition().x == position.x && t.Entity::getPosition().y == position.y; });
         if (it == treasures.end())
             return nullptr;
         Treasure *treasurePtr = new Treasure(*it);
@@ -99,8 +123,8 @@ namespace glimac
 
     Monster *DataParser::findMonster(glm::vec2 position)
     {
-        auto it = std::find_if(monsters.begin(), monsters.end(), [position](const Monster &m)
-                               { return m.Entity::getPosition().x == position.x && m.Entity::getPosition().y == position.y; });
+        auto it = std::find_if(monsters.begin(), monsters.end(), [this, position](const Monster &m)
+                               { return m.getLevelStage() == getCurrentLevel() && m.Entity::getPosition().x == position.x && m.Entity::getPosition().y == position.y; });
 
         return it == monsters.end() ? nullptr : &(*it);
     }
@@ -119,28 +143,36 @@ namespace glimac
     void DataParser::draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix) const
     {
         std::for_each(monsters.begin(), monsters.end(), [this, &uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Monster &monster)
-                      { if(checkDistance(monster.getPosition())){monster.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);} });
+                      { if(monster.getLevelStage() == getCurrentLevel() && checkDistance(monster.getPosition())){monster.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);} });
 
         std::for_each(treasures.begin(), treasures.end(), [this, &uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix, &globalMVMatrix](const Treasure &treasure)
-                      { if(checkDistance(treasure.getPosition())){treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);} });
+                      { if(treasure.getLevelStage() == getCurrentLevel() && checkDistance(treasure.getPosition())){treasure.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix, globalMVMatrix);} });
     }
 
-    void DataParser::idle(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map)
+    void DataParser::idle(float time, Player *player, SixAdjacencyCamera *camera, MapGenerator *map)
     {
         playerPosition = camera->getPlayerPosition();
-        monsters.erase(std::remove_if(monsters.begin(), monsters.end(), [](Monster &m)
+        monsters.erase(std::remove_if(monsters.begin(), monsters.end(), [player](Monster &m)
                                       {
                                         if(m.isDead()) {
                                             m.deleteTexture();
+                                            player->setMoney(m.getValue());
                                             return true;
                                         }
                                         return false; }),
                        monsters.end());
 
-        std::for_each(treasures.begin(), treasures.end(), [&time, &player, &camera, &map](Treasure &treasure)
-                      { treasure.updateActions(time, player, camera, map); });
+        std::for_each(treasures.begin(), treasures.end(), [this, &time, &player, &camera, &map](Treasure &treasure)
+                      {if(treasure.getLevelStage() == getCurrentLevel()) treasure.updateActions(time, player, camera, map); });
 
-        std::for_each(monsters.begin(), monsters.end(), [&time, &player, &camera, &map](Monster &monster)
-                      { monster.updateActions(time, player, camera, map); });
+        std::for_each(monsters.begin(), monsters.end(), [this, &time, &player, &camera, &map](Monster &monster)
+                      { if(monster.getLevelStage() == getCurrentLevel()) monster.updateActions(time, player, camera, map); });
     }
+    int DataParser::getGoal() const { return goal; }
+    bool DataParser::nextLevel()
+    {
+        currentLevel++;
+        return currentLevel == mapFiles.size();
+    }
+    int DataParser::getCurrentLevel() const { return currentLevel; }
 }

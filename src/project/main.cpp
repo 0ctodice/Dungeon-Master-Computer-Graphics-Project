@@ -141,8 +141,8 @@ int main(int argc, char **argv)
 
     // ELEMENTS DE BASE
 
-    std::string dataFile;
-    DataParser data;
+    std::string dataFile = argv[1];
+    DataParser data = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
     PPMParser mapParsed;
     MapGenerator map;
     SixAdjacencyCamera camera;
@@ -247,7 +247,8 @@ int main(int argc, char **argv)
                 }
                 else if (camera.getPlayerPosition() == map.getEndPosition())
                 {
-                    map.openDoor();
+                    if (*(player.getMoney()) >= data.getGoal())
+                        map.openDoor();
                 }
             }
         }
@@ -256,10 +257,11 @@ int main(int argc, char **argv)
         {
         case STARTING_SCREEN:
             // GENERATION DE LA MAP
-            dataFile = argv[1];
-            data = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
             mapParsed = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile()};
-            map = {&mapParsed, &windowManager};
+            // map = {&mapParsed, &windowManager};
+            map.setWindowManager(&windowManager);
+            map.setMapToParsed(&mapParsed);
+
             data.updateData(map.getStartPosition());
 
             // CREATION DES MATRIX
@@ -282,9 +284,6 @@ int main(int argc, char **argv)
             game = PLAYING;
             break;
         case PLAYING:
-            /*********************************
-             * HERE SHOULD COME THE RENDERING CODE
-             *********************************/
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             time = windowManager.getTime();
             glBindVertexArray(vao);
@@ -298,20 +297,17 @@ int main(int argc, char **argv)
 
             glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-            // DRAW HUD
             hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
 
             glBindVertexArray(0);
 
-            // Update the display
             windowManager.swapBuffers();
             if (player.isDead())
             {
                 game = DEATH;
             }
-            if (camera.getPlayerPosition() == map.getDoorPosition())
+            else if (camera.getPlayerPosition() == map.getDoorPosition())
             {
-                std::cout << "WINNER !" << std::endl;
                 game = WINNING;
             }
             break;
@@ -319,7 +315,11 @@ int main(int argc, char **argv)
             done = true;
             break;
         case WINNING:
-            done = true;
+            done = data.nextLevel();
+            if (!done)
+            {
+                game = STARTING_SCREEN;
+            }
             break;
         }
     }
