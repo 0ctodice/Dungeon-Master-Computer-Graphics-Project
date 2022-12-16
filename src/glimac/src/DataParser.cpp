@@ -25,13 +25,14 @@ namespace glimac
         for (int i = 0; i < nbLevels; i++)
         {
             std::string tmp;
-            std::getline(file, tmp);
+            std::getline(file, tmp, ':');
             mapFiles.push_back(tmp);
-        }
+            std::cout << tmp << std::endl;
+            tmp = "";
 
-        std::getline(file, parser);
-        goal = std::stoi(parser);
-        parser = "";
+            std::getline(file, tmp);
+            goals.push_back(std::stoi(tmp));
+        }
         std::getline(file, parser);
 
         nbTreasure = std::stoi(parser);
@@ -168,7 +169,7 @@ namespace glimac
         std::for_each(monsters.begin(), monsters.end(), [this, &time, &player, &camera, &map](Monster &monster)
                       { if(monster.getLevelStage() == getCurrentLevel()) monster.updateActions(time, player, camera, map); });
     }
-    int DataParser::getGoal() const { return goal; }
+    int DataParser::getGoal() const { return goals[currentLevel]; }
     bool DataParser::nextLevel()
     {
         currentLevel++;

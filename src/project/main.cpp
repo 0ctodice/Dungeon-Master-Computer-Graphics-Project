@@ -319,6 +319,7 @@ int main(int argc, char **argv)
             if (!done)
             {
                 game = STARTING_SCREEN;
+                player.setMoney(*(player.getMoney()) * -1);
             }
             break;
         }

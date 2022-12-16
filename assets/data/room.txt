@@ -1,8 +1,7 @@
 #room
 2
-room.ppm
-map.ppm
-0
+room.ppm:100
+map.ppm:10
 6
 1:1:1:0:tune:1:120:dungeon/coin.png
 2:1:3:0:sword:4:20:sword/sword004.png

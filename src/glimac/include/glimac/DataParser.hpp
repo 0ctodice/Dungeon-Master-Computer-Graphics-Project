@@ -21,11 +21,9 @@ namespace glimac
         MapGenerator *map = nullptr;
         std::string commentaire;
         std::vector<std::string> mapFiles;
+        std::vector<int> goals;
         int currentLevel = 0;
-        // std::string levelName;
-        // std::string mapFile;
         int nbTreasure;
-        int goal;
         std::vector<Treasure> treasures;
         int nbMonster;
         std::vector<Monster> monsters;
