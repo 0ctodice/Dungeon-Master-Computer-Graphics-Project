@@ -144,7 +144,7 @@ int main(int argc, char **argv)
     std::string dataFile = argv[1];
     DataParser data = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/data/" + dataFile};
     PPMParser mapParsed;
-    MapGenerator map;
+    MapGenerator map{&windowManager};
     SixAdjacencyCamera camera;
 
     glm::mat4 globalProjectionMatrix;
@@ -258,8 +258,6 @@ int main(int argc, char **argv)
         case STARTING_SCREEN:
             // GENERATION DE LA MAP
             mapParsed = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile()};
-            // map = {&mapParsed, &windowManager};
-            map.setWindowManager(&windowManager);
             map.setMapToParsed(&mapParsed);
 
             data.updateData(map.getStartPosition());

@@ -95,11 +95,8 @@ namespace glimac
         }
 
     public:
-        MapGenerator() {}
         MapGenerator(SDLWindowManager *window) : window{window} {}
-        MapGenerator(PPMParser *mapParsed, SDLWindowManager *window);
         ~MapGenerator();
-        void setWindowManager(SDLWindowManager *wind);
         void setMapToParsed(PPMParser *mapParsed);
         void idle(glm::vec2 playerPos);
         void draw(GLuint uTextureLocation, GLuint uMVMatrixLocation, GLuint uMVPMatrixLocation, GLuint uNormalMatrixLocation, GLuint uLightPosLocation, glm::mat4 *globalPMatrix, glm::mat4 globalMVMatrix = glm::mat4(1.f));
