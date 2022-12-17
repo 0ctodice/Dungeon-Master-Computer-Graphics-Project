@@ -8,6 +8,7 @@ namespace glimac
     {
     private:
         glm::vec2 position;
+        bool rendered = false;
 
     public:
         Tile(glm::vec2 pos) : position{pos} {}
@@ -28,6 +29,8 @@ namespace glimac
 
         void setPosition(glm::vec2 pos) { position = pos; }
         glm::vec2 getPosition() const { return position; }
+        bool shouldRender() const { return rendered; }
+        void changeRender(bool should) { rendered = should; }
     };
 
 }
