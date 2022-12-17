@@ -19,17 +19,6 @@
 
 namespace glimac
 {
-    enum TILETYPE
-    {
-        WALL_N,
-        WALL_S,
-        WALL_W,
-        WALL_E,
-        WATER,
-        FLOOR,
-        CEILING
-    };
-
     class MapGenerator
     {
     private:

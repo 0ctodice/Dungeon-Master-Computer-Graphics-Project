@@ -9,6 +9,8 @@ namespace glimac
         setCa(inventory.second.getValue());
     }
     int *Player::getMoney() { return &money; }
+    int *Player::getPV() { return &pv; }
+    int *Player::getPVMax() { return &pvMax; }
     void Player::setMoney(int value) { money += value; }
     Treasure Player::getOffensive() const { return inventory.first; }
     Treasure Player::getDefensive() const { return inventory.second; }

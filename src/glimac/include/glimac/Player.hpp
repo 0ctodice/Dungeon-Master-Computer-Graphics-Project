@@ -19,6 +19,8 @@ namespace glimac
     public:
         Player();
         int *getMoney();
+        int *getPV();
+        int *getPVMax();
         Treasure getOffensive() const;
         Treasure getDefensive() const;
         void setOffensive(Treasure t);

@@ -11,7 +11,7 @@ namespace glimac
     int Character::getPVMax() const { return pvMax; }
     void Character::setAtk(int value) { atk = value; }
     void Character::setCa(int value) { ca = value; }
-    void Character::setPV(int value) { pv = std::max(pvMax, pv + value); }
+    void Character::setPV(int value) { pv = std::min(pvMax, pv + value); }
     void Character::setPVMax(int value)
     {
         pvMax += value;
