@@ -33,9 +33,11 @@ struct Vertex3DText
 enum GAMESTATE
 {
     STARTING_SCREEN,
+    GATHERING_DATA,
+    STARTING_A_LEVEL,
     PLAYING,
     DEATH,
-    WINNING,
+    WINNING
 };
 
 int main(int argc, char **argv)
@@ -148,9 +150,9 @@ int main(int argc, char **argv)
     SixAdjacencyCamera camera;
 
     glm::mat4 globalProjectionMatrix;
-    glm::mat4 hudProjectionMatrix;
     glm::mat4 globalMVMatrix;
-    glm::mat4 hudMVMatrix;
+    glm::mat4 hudProjectionMatrix = glm::scale(glm::mat4{1.f}, glm::vec3{1.f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.f});
+    glm::mat4 hudMVMatrix = glm::mat4{1.f};
 
     glm::vec2 playerDirection;
     float angle;
@@ -172,7 +174,6 @@ int main(int argc, char **argv)
             }
             if (e.type == SDL_KEYDOWN && game == PLAYING)
             {
-                glm::vec2 target;
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_z:
@@ -196,66 +197,104 @@ int main(int argc, char **argv)
                 case SDLK_i:
                     player.displayInfos();
                     break;
+                case SDLK_h:
+                    player.takeDamage(player.getCa() + 1);
+                    break;
                 }
             }
-            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT && game == PLAYING)
+            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
             {
-                Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
-                Monster *monsterPtr = data.findMonster(camera.getFrontTile());
-                if (treasurePtr != nullptr)
+                switch (game)
                 {
-                    switch (treasurePtr->getType())
+                case STARTING_SCREEN:
+                case DEATH:
+                    game = GATHERING_DATA;
+                    break;
+                case STARTING_A_LEVEL:
+                    game = PLAYING;
+                    break;
+                case WINNING:
+                    done = true;
+                    break;
+                case PLAYING:
+                    Treasure *treasurePtr = data.findTreasure(camera.getFrontTile());
+                    Monster *monsterPtr = data.findMonster(camera.getFrontTile());
+                    if (treasurePtr != nullptr)
                     {
-                    case 1:
-                        player.setMoney(treasurePtr->getValue());
-                        break;
-                    case 2:
-                        player.setPV(treasurePtr->getValue());
-                        break;
-                    case 3:
-                        player.setPVMax(treasurePtr->getValue());
-                        break;
-                    case 4:
-                    {
-                        auto old = player.getOffensive();
-                        if (old.getName() != "fist")
+                        switch (treasurePtr->getType())
                         {
-                            old.setPosition(treasurePtr->getPosition());
-                            data.addTreasure(old);
-                        }
+                        case 1:
+                            player.setMoney(treasurePtr->getValue());
+                            break;
+                        case 2:
+                            player.setPV(treasurePtr->getValue());
+                            break;
+                        case 3:
+                            player.setPVMax(treasurePtr->getValue());
+                            break;
+                        case 4:
+                        {
+                            auto old = player.getOffensive();
+                            if (old.getName() != "fist")
+                            {
+                                old.setPosition(treasurePtr->getPosition());
+                                data.addTreasure(old);
+                            }
 
-                        player.setOffensive(*treasurePtr);
-                        break;
-                    }
-                    case 5:
-                    {
-                        auto old = player.getDefensive();
-                        if (old.getName() != "skin")
-                        {
-                            old.setPosition(treasurePtr->getPosition());
-                            data.addTreasure(old);
+                            player.setOffensive(*treasurePtr);
+                            break;
                         }
-                        player.setDefensive(*treasurePtr);
-                        break;
+                        case 5:
+                        {
+                            auto old = player.getDefensive();
+                            if (old.getName() != "skin")
+                            {
+                                old.setPosition(treasurePtr->getPosition());
+                                data.addTreasure(old);
+                            }
+                            player.setDefensive(*treasurePtr);
+                            break;
+                        }
+                        }
+                        delete (treasurePtr);
                     }
+                    else if (monsterPtr != nullptr)
+                    {
+                        monsterPtr->takeDamage(player.getAtk());
                     }
-                    delete (treasurePtr);
-                }
-                else if (monsterPtr != nullptr)
-                {
-                    monsterPtr->takeDamage(player.getAtk());
-                }
-                else if (camera.getPlayerPosition() == map.getEndPosition())
-                {
-                    if (*(player.getMoney()) >= data.getGoal())
-                        map.openDoor();
+                    else if (camera.getPlayerPosition() == map.getEndPosition())
+                    {
+                        if (*(player.getMoney()) >= data.getGoal())
+                            map.openDoor();
+                    }
+                    break;
                 }
             }
         }
 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindVertexArray(vao);
+
+        MatrixManager matrix{&hudProjectionMatrix, hudMVMatrix};
+
         switch (game)
         {
         case STARTING_SCREEN:
+            hud.drawSplashScreen(0, uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
+            break;
+        case STARTING_A_LEVEL:
+            hud.drawSplashScreen(1, uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
+            matrix.scale(glm::vec3{0.2});
+            matrix.translate(glm::vec3(0.f, 0.f, -1.f));
+            hud.drawNumber(std::to_string(data.getGoal()), matrix, uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix);
+            break;
+        case DEATH:
+            hud.drawSplashScreen(2, uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
+            break;
+        case WINNING:
+            hud.drawSplashScreen(3, uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
+            break;
+        case GATHERING_DATA:
             // GENERATION DE LA MAP
             mapParsed = {"/home/thomas2dumont/Computer_Graphics/Dungeon-Master-Computer-Graphics-Project/assets/map/" + data.getMapFile()};
             map.setMapToParsed(&mapParsed);
@@ -265,9 +304,7 @@ int main(int argc, char **argv)
             // CREATION DES MATRIX
 
             globalProjectionMatrix = glm::perspective(glm::radians(70.f), (float)GAME_ZONE_WIDTH / (float)GAME_ZONE_HEIGHT, .1f, 100.f);
-            hudProjectionMatrix = glm::scale(glm::mat4{1.f}, glm::vec3{1.f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.f});
             globalMVMatrix = glm::mat4{1.f};
-            hudMVMatrix = glm::mat4{1.f};
 
             playerDirection = map.getFirstDirection();
             angle = 90.f * playerDirection.x + 180.f * (playerDirection.y > 0);
@@ -279,12 +316,10 @@ int main(int argc, char **argv)
             camera = {playerDirection, &globalMVMatrix, &map};
 
             time = 0.f;
-            game = PLAYING;
+            game = STARTING_A_LEVEL;
             break;
         case PLAYING:
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             time = windowManager.getTime();
-            glBindVertexArray(vao);
 
             glViewport(0, WINDOW_HEIGHT - GAME_ZONE_HEIGHT, GAME_ZONE_WIDTH, GAME_ZONE_HEIGHT);
 
@@ -297,30 +332,28 @@ int main(int argc, char **argv)
 
             hud.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, &hudProjectionMatrix, hudMVMatrix);
 
-            glBindVertexArray(0);
-
-            windowManager.swapBuffers();
             if (player.isDead())
             {
                 game = DEATH;
             }
             else if (camera.getPlayerPosition() == map.getDoorPosition())
             {
-                game = WINNING;
-            }
-            break;
-        case DEATH:
-            done = true;
-            break;
-        case WINNING:
-            done = data.nextLevel();
-            if (!done)
-            {
-                game = STARTING_SCREEN;
-                player.setMoney(*(player.getMoney()) * -1);
+                auto finished = data.nextLevel();
+                if (!finished)
+                {
+                    player.setMoney(*(player.getMoney()) * -1);
+                    game = GATHERING_DATA;
+                }
+                else
+                {
+                    game = WINNING;
+                }
             }
             break;
         }
+
+        glBindVertexArray(0);
+        windowManager.swapBuffers();
     }
 
     // NETTOYAGE

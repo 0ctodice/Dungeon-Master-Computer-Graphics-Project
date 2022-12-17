@@ -96,15 +96,62 @@ namespace glimac
 
     drawNumber(val, numberDefMatrix, uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation, globalPMatrix);
   }
+
+  void HUD::drawSplashScreen(int splashScreenId,
+                             GLuint uTextureLocation,
+                             GLuint uMVMatrixLocation,
+                             GLuint uMVPMatrixLocation,
+                             GLuint uNormalMatrixLocation,
+                             GLuint uLightPosLocation,
+                             glm::mat4 *globalPMatrix,
+                             glm::mat4 globalMVMatrix) const
+  {
+    splashScreen[splashScreenId].bind();
+    MatrixManager screenMatrix{globalPMatrix, globalMVMatrix};
+    screenMatrix.scale(glm::vec3{2.1f});
+    screenMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+    splashScreen[splashScreenId].unbind();
+  }
+
+  void HUD::drawNumber(std::string parsedValue,
+                       MatrixManager numberMatrix,
+                       GLuint uTextureLocation,
+                       GLuint uMVMatrixLocation,
+                       GLuint uMVPMatrixLocation,
+                       GLuint uNormalMatrixLocation,
+                       GLuint uLightPosLocation,
+                       glm::mat4 *globalPMatrix) const
+  {
+    float offset = std::ceil((float)parsedValue.size() / 2.f);
+    offset = parsedValue.size() % 2 == 0 ? offset + 0.5f : offset;
+    numberMatrix.translate(glm::vec3(-.75f * offset, 0.f, 0.f));
+    std::for_each(parsedValue.begin(), parsedValue.end(), [this, &offset, &numberMatrix, &uTextureLocation, &uMVMatrixLocation, &uMVPMatrixLocation, &uNormalMatrixLocation, &uLightPosLocation, &globalPMatrix](const char &i)
+                  {
+                    numberMatrix.translate(glm::vec3(.75f,0.f, 0.f));
+                    numbers[static_cast<int>(i - '0')].bind();
+                    numberMatrix.draw(uTextureLocation, uMVMatrixLocation, uMVPMatrixLocation, uNormalMatrixLocation, uLightPosLocation);
+                    numbers[static_cast<int>(i - '0')].unbind(); });
+  }
+
   void HUD::clean()
   {
     playerInventory = nullptr;
+    playerMoney = nullptr;
+    playerMaxHealth = nullptr;
+    playerCurrentHealth = nullptr;
     delete (playerInventory);
+    delete (playerMoney);
+    delete (playerMaxHealth);
+    delete (playerCurrentHealth);
+    hud.deleteTexture();
+    coin.deleteTexture();
+    sword.deleteTexture();
+    shield.deleteTexture();
     std::for_each(numbers.begin(), numbers.end(), [](Texture &t)
                   { t.deleteTexture(); });
     std::for_each(lifeBar.begin(), lifeBar.end(), [](Texture &t)
                   { t.deleteTexture(); });
-    hud.deleteTexture();
-    coin.deleteTexture();
+    std::for_each(splashScreen.begin(), splashScreen.end(), [](Texture &t)
+                  { t.deleteTexture(); });
   }
 }
