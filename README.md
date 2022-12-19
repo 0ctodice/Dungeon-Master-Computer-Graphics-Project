@@ -4,6 +4,27 @@
 
 Projet de la matière synthèse d'image pour le Master 2 Informatique Sciences de l'Image
 
+## Installation
+
+- git clone git@github.com:0ctodice/Dungeon-Master-Computer-Graphics-Project.git (ou décompressez le fichier zip)
+- mkdir build
+- cmake ..
+- make
+- ./project/project_main [nom du fichier data]
+
+## Comment jouer
+
+les déplacement se font avec les touches suivantes :
+
+- Z : déplacement vers l'avant
+- S : déplacement vers l'arrière
+- Q : déplacement vers la gauche
+- D : déplacement vers la droite
+- A : rotation vers la gauche
+- E : rotation vers la droite
+
+Les interactions avec les monstres et les objets se font avec le clic gauche
+
 ## A. Données du donjon
 
 ### 1. Structure du niveau
@@ -148,6 +169,32 @@ Pas de gestion des ombres.
 ### 8. Interaction avec les monstres : combat...
 
 ## 6. Les extensions proposées
+
+### Collisions
+
+Etant donné que nous conservons et mettons à jour les positions des tiles ainsi que la position du joueur, nous pouvons vérifier avant chaque déplacement la présence d'un mur et ainsi empêcher ce déplacement si besoin.
+
+### Transparence
+
+Ayant utilisé la technique des quads pour l'affichage, l'utilisation de png a été mis en place.
+
+### Amélioration du comportement des monstres
+
+Les monstres ont la possibilité de "sentir" la présence du jour sur un rayon de 4 tiles. Ils vont ainsi se diriger vers ce dernier en prenant en compte les murs autour de lui.
+
+### Plusieurs niveaux
+
+Le donjon peux comprendre plusieurs étages, pour cela, il est impératif de suivre la spécification du fichiers des données (ci-dessus).
+De plus, bien qu'on charge l'ensemble des monstres et trésors, on ne charge seulement qu'un seul niveau à la fois. Les monstres et trésors n'appartenant pas à l'étage courant n'est ni modifié ni afficher.
+
+### Amélioration des interactions
+
+Plusieurs interactions on été amélioré :
+
+- Lorsque le joueur possède suffisamment de pièce d'or, lorsqu'il cliquera sur la porte, cette dernière s'ouvrira et sera animé.
+- Les monstres possèdent une caractéristique de vitesse, passé dans le fichier de données. On peut donc avoir des monstres qui tape ou se déplace 2 fois plus vite que d'autre mais feront moins de dégâts.
+- Le héro possède un "inventaire", il peut conserver sur lui une arme defensive et offensive qu'il peut échanger à tout moment avec d'autre armes dans le niveau. Ce changement n'est pas définitif.
+- 
 
 ## 7.  Résumé des classes développés pour le projet
 

@@ -61,6 +61,12 @@ enum GAMESTATE
 
 int main(int argc, char **argv)
 {
+    if (argc != 2)
+    {
+        std::cerr << "Usage: " << argv[0] << " <dataFile.txt>" << std::endl;
+        return EXIT_FAILURE;
+    }
+
     GAMESTATE game = STARTING_SCREEN;
 
     const int WINDOW_WIDTH = 1280;
