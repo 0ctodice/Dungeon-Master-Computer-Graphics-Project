@@ -3,7 +3,7 @@
 
 namespace glimac
 {
-    Entity::Entity(int id, glm::vec2 pos, int lvl, std::string name, std::string texture) : id{id}, position{pos}, levelStage{lvl}, name{name}, textureName{texture}, texture{texture, false} {}
+    Entity::Entity(int id, glm::vec2 pos, glm::vec2 initPos, int lvl, std::string name, std::string texture) : id{id}, position{pos}, initialPosition{initPos}, levelStage{lvl}, name{name}, textureName{texture}, texture{texture, true} {}
     void Entity::updateActions(float time, Character *player, SixAdjacencyCamera *camera, MapGenerator *map)
     {
         auto newPos = position - camera->getPlayerPosition();
@@ -18,6 +18,7 @@ namespace glimac
     void Entity::deleteTexture() { texture.deleteTexture(); }
     int Entity::getId() const { return id; }
     glm::vec2 Entity::getPosition() const { return position; }
+    glm::vec2 Entity::getInitialPosition() const { return initialPosition; }
     int Entity::getLevelStage() const { return levelStage; }
     std::string Entity::getName() const { return name; }
     Texture Entity::getTexture() const { return texture; }

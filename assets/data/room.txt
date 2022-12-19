@@ -9,5 +9,6 @@ map.ppm:10
 4:2:3:0:popotte:2:10:dungeon/health.png
 5:1:2:0:popotteMax:3:10:dungeon/maxhealth.png
 6:2:2:0:poorKatana:4:999:sword/sword015.png
-1
-1:8:7:1:slime:2:0:10:1.0:10:slime.png
+2
+1:8:7:1:hand:2:0:10:1.0:10:monster/hand.png
+2:8:6:1:octopus:2:0:10:1.0:10:monster/octopus.png

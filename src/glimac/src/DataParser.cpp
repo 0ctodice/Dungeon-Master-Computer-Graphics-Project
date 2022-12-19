@@ -53,7 +53,7 @@ namespace glimac
             int value = parseInt(&file);
             std::string texture;
             std::getline(file, texture);
-            Treasure treasure{id, position, lvl, name, type, value, texture};
+            Treasure treasure{id, position, position, lvl, name, type, value, texture};
             treasures.push_back(treasure);
         }
 
@@ -75,7 +75,7 @@ namespace glimac
             int value = parseInt(&file);
             std::string texture;
             std::getline(file, texture);
-            Monster monster{id, position, lvl, name, atk, ca, pv, actionTime, value, texture};
+            Monster monster{id, position, position, lvl, name, atk, ca, pv, actionTime, value, texture};
             monsters.push_back(monster);
         }
 
@@ -93,18 +93,18 @@ namespace glimac
                         if(monster.getLevelStage() != getCurrentLevel()){
                             return monster;
                         }
-                        auto pos = monster.getPosition() - origin;
+                        auto pos = monster.getInitialPosition() - origin;
                         pos.x *=-1;
-                        return Monster{monster.getId(), pos, monster.getLevelStage(), monster.getName(), monster.getAtk(), monster.getCa(),monster.getPVMax(), monster.getActionTime(), monster.getValue(), monster.getTextureName()}; });
+                        return Monster{monster.getId(), pos,monster.getInitialPosition(), monster.getLevelStage(), monster.getName(), monster.getAtk(), monster.getCa(),monster.getPVMax(), monster.getActionTime(), monster.getValue(), monster.getTextureName()}; });
 
         std::transform(treasures.begin(), treasures.end(), treasures.begin(), [this, origin](Treasure &treasure)
                        {
                         if(treasure.getLevelStage() != getCurrentLevel()){
                             return treasure;
                         }
-                        auto pos = treasure.getPosition() - origin;
+                        auto pos = treasure.getInitialPosition() - origin;
                         pos.x *= -1;
-                        return Treasure{treasure.getId(), pos, treasure.getLevelStage(), treasure.getName(), treasure.getType(), treasure.getValue(), treasure.getTextureName()}; });
+                        return Treasure{treasure.getId(), pos,treasure.getInitialPosition(), treasure.getLevelStage(), treasure.getName(), treasure.getType(), treasure.getValue(), treasure.getTextureName()}; });
     }
 
     Treasure *DataParser::findTreasure(glm::vec2 position)

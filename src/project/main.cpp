@@ -158,6 +158,8 @@ int main(int argc, char **argv)
     float angle;
 
     float time;
+    int currentPlayerPV = *(player.getPV());
+
     // BOUCLE D'APPLICATION
 
     bool done = false;
@@ -316,6 +318,13 @@ int main(int argc, char **argv)
             camera = {playerDirection, &globalMVMatrix, &map};
 
             time = 0.f;
+
+            if (*(player.getPV()) <= 0)
+            {
+                player.setPV(currentPlayerPV);
+            }
+            currentPlayerPV = *(player.getPV());
+
             game = STARTING_A_LEVEL;
             break;
         case PLAYING:
@@ -338,16 +347,8 @@ int main(int argc, char **argv)
             }
             else if (camera.getPlayerPosition() == map.getDoorPosition())
             {
-                auto finished = data.nextLevel();
-                if (!finished)
-                {
-                    player.setMoney(*(player.getMoney()) * -1);
-                    game = GATHERING_DATA;
-                }
-                else
-                {
-                    game = WINNING;
-                }
+                player.setMoney(data.getGoal() * -1);
+                game = data.nextLevel() ? WINNING : GATHERING_DATA;
             }
             break;
         }

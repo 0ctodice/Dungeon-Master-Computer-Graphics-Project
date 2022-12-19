@@ -13,7 +13,7 @@ namespace glimac
     {
     private:
         using Inventory = std::pair<Treasure, Treasure>;
-        Inventory inventory = std::make_pair(Treasure{0, glm::vec2(0, 0), 0, "fist", 3, 1, ""}, Treasure{0, glm::vec2(0, 0), 0, "skin", 4, 1, ""});
+        Inventory inventory = std::make_pair(Treasure{0, glm::vec2(0, 0), glm::vec2(0, 0), 0, "fist", 3, 1, ""}, Treasure{0, glm::vec2(0, 0), glm::vec2(0, 0), 0, "skin", 4, 1, ""});
         int money = 0;
 
     public:
