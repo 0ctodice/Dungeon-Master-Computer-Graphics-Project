@@ -1,6 +1,0 @@
-#room2
-1
-room2.ppm:0
-0
-1
-1:1:2:0:slime:2:0:10:1.0:10:slime.png

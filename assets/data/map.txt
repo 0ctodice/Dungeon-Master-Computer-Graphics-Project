@@ -1,7 +1,0 @@
-#map
-1
-map.ppm
-10
-0
-1
-1:8:7:1:hand:2:0:10:1.0:10:monster/hand.png
