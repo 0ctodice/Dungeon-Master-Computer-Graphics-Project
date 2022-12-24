@@ -4,6 +4,8 @@
 
 Projet de la matière synthèse d'image pour le Master 2 Informatique Sciences de l'Image
 
+lien du github : https://github.com/0ctodice/Dungeon-Master-Computer-Graphics-Project
+
 ---
 
 ## Installation
