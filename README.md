@@ -9,10 +9,15 @@ Projet de la matière synthèse d'image pour le Master 2 Informatique Sciences d
 ## Installation
 
 - git clone https://github.com/0ctodice/Dungeon-Master-Computer-Graphics-Project.git (ou décompressez le fichier zip)
+- cd src
 - mkdir build
 - cmake ..
 - make
 - ./project/project_main [nom du fichier data]
+
+## Warning shader
+
+Les shaders de ce projet utilise la version 330 core, si vous n'êtes pas sur de la version de votre opengl, je vous invite à metre cette ligne en commentaire et décommenter les deux ligne au dessus indiquant *#version 300 es* et *precision mediump float;*.
 
 ## Comment jouer
 
