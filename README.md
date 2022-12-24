@@ -8,7 +8,7 @@ Projet de la matière synthèse d'image pour le Master 2 Informatique Sciences d
 
 ## Installation
 
-- git clone git@github.com:0ctodice/Dungeon-Master-Computer-Graphics-Project.git (ou décompressez le fichier zip)
+- git clone https://github.com/0ctodice/Dungeon-Master-Computer-Graphics-Project.git (ou décompressez le fichier zip)
 - mkdir build
 - cmake ..
 - make
