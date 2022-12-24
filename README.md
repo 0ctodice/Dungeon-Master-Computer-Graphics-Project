@@ -1,8 +1,10 @@
-# Dungeon-Master-Computer-Graphics-Project
+# Dungeon Master (A.K.A Dabloon's Lair) - Computer Graphics Project
 
 ## Thomas DUMONT
 
 Projet de la matière synthèse d'image pour le Master 2 Informatique Sciences de l'Image
+
+---
 
 ## Installation
 
@@ -110,7 +112,7 @@ map.ppm:10
 3. Modifie la santé MAX du joueur
 4. Représente une arme de CAC
 5. Représente une protection influant sur la CA
-6. 
+   
 ## 3. Monstres
 
 L'intelligence artificielle des monstres sera très simple, tous les X temps soit ils avanceront vers le joueurs s'ils sentent sa présence à une certaines distance, soit ils attaqueront ce dernier au corps à corps, soit ils attendront.
@@ -129,44 +131,16 @@ Pas de gestion des ombres.
 
 ## 5. Les spécifications implémentées
 
-### 1. Chargement de la carte : détermination du point d'entrée et de sortie
+L'ensemble des spécifications demandés implémentées sont les suivantes :
 
-- ***PPMParser** :
-  - s'occupe de récupérer toutes les infos de la map.
-- **MapGenerator** :
-  - fait le tri parmis tout les pixels et dispatche les différentes tiles dans des sets.
-  - nous allons stockons uniquement les murs (seulement ceux proche d'un couloirs, de l'eau, de la sortie ou l'entrée) dans 4 sets différents dependant de leur orientation.
-  - uniformise les coordonnées des tiles selon la position de l'entrée et applique une multiplication par -1 sur la coordonnée x pour remettre la map dans le même sens que l'image.
-
-### 2. Chargement des trésors et des monstres ainsi que leurs caractéristiques
-
-- **DataParser** :
-  - va récupérer l'ensemble des informations des fichiers data.
-  - stocker les noms des map dans un vector de string.
-  - va mettre à jour la position des monstres et des trésors selon la position du point de départ.
-  
-### 3. Affichage de la carte (des couloirs du donjon)
-
-- **MapGenerator** :
-  - la fonction *draw* s'occupe de mettre à jour la position des tiles et de les déssiner à chaque frame, en prenant soin de dessiner les tiles de même texture en même temps.
-  - s'occupe aussi d'animer et dessiner la porte
-
-### 4. Navigation simple dans le donjon
-
-- **SixAdjacencyCamera** :
-  - il y a une fonction par movement, ces dernière vont ajouter soit une rotation de 90 degrée soit une translation de 1 à la Modèle View Matrix générale.
-
-### 5. Interaction avec les trésors : ramassage de trésors et modifications des caractéristiques du personnage
-
-- **main** :
-  - on utilise le pollEvent du **WindowManager** pour récupérer le clique gauche.
-  - puis on va utilisé la fonction *findTreasure* qui va retourner un pointer sur trésor selon la position de la case devant le joueur, on récupère sa value et selon son **TreasureType** on va modifié la bonne caractéristique du joueur.
-
-### 6. Intégration et visualisation des monstres dans le donjon
-
-### 7. Comportement des monstres
-
-### 8. Interaction avec les monstres : combat...
+1. Chargement de la carte : détermination du point d'entrée et de sortie
+2. Chargement des trésors et des monstres ainsi que leurs caractéristiques
+3. Affichage de la carte (des couloirs du donjon)
+4. Navigation simple dans le donjon
+5. Interaction avec les trésors : ramassage de trésors et modifications des caractéristiques du personnage
+6. Intégration et visualisation des monstres dans le donjon
+7. Comportement des monstres
+8. Interaction avec les monstres : combat...
 
 ## 6. Les extensions proposées
 
@@ -194,9 +168,19 @@ Plusieurs interactions on été amélioré :
 - Lorsque le joueur possède suffisamment de pièce d'or, lorsqu'il cliquera sur la porte, cette dernière s'ouvrira et sera animé.
 - Les monstres possèdent une caractéristique de vitesse, passé dans le fichier de données. On peut donc avoir des monstres qui tape ou se déplace 2 fois plus vite que d'autre mais feront moins de dégâts.
 - Le héro possède un "inventaire", il peut conserver sur lui une arme defensive et offensive qu'il peut échanger à tout moment avec d'autre armes dans le niveau. Ce changement n'est pas définitif.
-- 
+
+### Splashscreen
+
+Il existe quelques splashscreens dans le projet :
+
+- gamestart, présentant le jeu
+- gameover, indiquant la mort du joueur
+- treasure, indiquant le nombre de pièce d'or que doit obtenir le joueur pour passer une salle du niveau
+- theend, félicitant le joueur d'avoir fini le jeu
 
 ## 7.  Résumé des classes développés pour le projet
+
+### Toutes ces classes sont présente dans le dossier glimac
 
 - **Character** : classe mère pour **Player** et **Monster**
 - **DataParser** : classe parsant les fichiers de données et stockant/gérant/affichant l'ensemble des **Entity** et infos des niveaux
@@ -213,7 +197,14 @@ Plusieurs interactions on été amélioré :
 - **TileSet** : classe stockant un set de tile ainsi que l'orientation qu'elles doivent avoir, de plus gère leur affichage
 - **Treasure** : classe gérant les infos d'un trésor.
 
-## 8. Présentation de quelques assets utilisable
+## 8. Assets
+
+les assets utilisable sont présentes dans le dossier assets dispatché dans l'architecture suivante :
+- Data : dossier contenant tout les fichiers texte avec l'ensemble des infos du niveau.
+- map : dossier ciblé par le projet pour récupéré les fichiers ppm.
+- textures : dossier avec toutes les textures du projet.
+
+### Bonus : petit showroom de quelques assets
 
 ### Trésors
 
